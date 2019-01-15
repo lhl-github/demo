@@ -1,0 +1,883 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.student.text.dao.StuLearn_di" >
+<!-- 音标 -->
+<!-- 保存尝试发音 -->
+<insert id="saveLearnBySymbol" parameterType="java.util.Map">
+insert into stu101
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu101_01,
+</if>
+<if test="ybid != null and ybid !=''" >
+stu101_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu101_03,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="ybid != null and ybid !=''" >
+#{ybid,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!-- 根据ybid和stuid判断用户是否存在学习 -->
+<select id="findLearnByYbid" resultType="java.util.Map">
+SELECT 
+id learn_id,
+stu101_01 stuid,
+stu101_02 ybid,
+stu101_03 learn_video
+FROM stu101
+WHERE stu101_01=#{stuid,jdbcType=VARCHAR}
+AND stu101_02=#{ybid,jdbcType=VARCHAR}
+</select>
+<!-- 如果用户存在新的录音，则删除旧录音添加新录音 -->
+<update id="updateLearnBySymbol" parameterType="java.util.Map">
+update stu101
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu101_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ </set>
+ WHERE stu101_01=#{stuid,jdbcType=VARCHAR}
+AND stu101_02=#{ybid,jdbcType=VARCHAR}
+</update>
+
+<!-- 音标单词学习（挑战一下） -->
+<!-- 保存音标单词实例 -->
+<insert id="saveLearnBySymbolWord" parameterType="java.util.Map">
+insert into stu102
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu102_01,
+</if>
+<if test="yb_wordId != null and yb_wordId !=''" >
+stu102_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu102_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu102_04,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="yb_wordId != null and yb_wordId !=''" >
+#{yb_wordId,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+</trim>
+</insert>
+<!-- 根据yb_wordId和stuid判断用户是否存在 -->
+<select id="findLearnBySymbolWord" resultType="java.util.Map">
+SELECT
+stu102_03 learn_video,
+stu102_04 learn_score
+FROM stu102
+WHERE stu102_01=#{stuid,jdbcType=VARCHAR}
+AND stu102_02=#{yb_wordId,jdbcType=VARCHAR}
+</select>
+<!-- 若存在替换为新录音;判断评分是否为最高 -->
+<update id="updateLearnBySymbolWord" parameterType="java.util.Map">
+update stu102
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu102_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu102_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE stu102_01=#{stuid,jdbcType=VARCHAR}
+AND stu102_02=#{yb_wordId,jdbcType=VARCHAR}
+</update>
+
+<!-- 单词 -->
+<!-- 保存单词学习录音 -->
+<insert id="saveLearnWord" parameterType="java.util.Map">
+insert into stu103
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu103_01,
+</if>
+<if test="word_id != null and word_id !=''" >
+stu103_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu103_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu103_04,
+</if>
+<if test="type != null and type !=''" >
+type,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="word_id != null and word_id !=''" >
+#{word_id,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+<if test="type != null and type !=''" >
+#{type,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!-- 根据word_id,stuid判断是否存在此学习单词 -->
+<select id="findLearnByWord" resultType="java.util.Map">
+SELECT 
+s.stu103_03 learn_video,
+s.stu103_04 learn_score,
+s.type
+FROM stu103 s
+WHERE s.stu103_01=#{stuid,jdbcType=VARCHAR}
+AND s.stu103_02=#{word_id,jdbcType=VARCHAR}
+</select>
+<!-- 若存在替换为新录音;判断评分是否为最高 -->
+<update id="updateLearnByWord" parameterType="java.util.Map">
+update stu103
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu103_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu103_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE stu103_01=#{stuid,jdbcType=VARCHAR}
+AND stu103_02=#{word_id,jdbcType=VARCHAR}
+</update>
+<!-- 统计本单元下的学习单词的个数 -->
+<select id="countByLearnWord" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM stu103
+WHERE stu103_01=#{stuid,jdbcType=VARCHAR}
+<if test="type != null and type !=''" >
+AND type=#{type,jdbcType=VARCHAR}
+</if>
+<if test="word_id != null and word_id !=''" >
+AND stu103_02=#{word_id,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 统计本单元下的所有单词 -->
+<select id="countByWord" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM k103
+WHERE type=#{type,jdbcType=VARCHAR}
+AND k103_06='word'
+</select>
+
+<!-- 短语 -->
+<insert id="saveLearnPhrase" parameterType="java.util.Map">
+insert into stu107
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu107_01,
+</if>
+<if test="phrase_id != null and phrase_id !=''" >
+stu107_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu107_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu107_04,
+</if>
+<if test="type != null and type !=''" >
+type,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="phrase_id != null and phrase_id !=''" >
+#{phrase_id,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+<if test="type != null and type !=''" >
+#{type,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<select id="findLearnByPhrase" resultType="java.util.Map">
+SELECT 
+s.stu107_03 learn_video,
+s.stu107_04 learn_score,
+s.type
+FROM stu107 s
+WHERE s.stu107_01=#{stuid,jdbcType=VARCHAR}
+AND s.stu107_02=#{phrase_id,jdbcType=VARCHAR}
+</select>
+<update id="updateLearnByPhrase" parameterType="java.util.Map">
+update stu107
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu107_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu107_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE stu107_01=#{stuid,jdbcType=VARCHAR}
+AND stu107_02=#{phrase_id,jdbcType=VARCHAR}
+</update>
+<select id="countByLearnByPhrase" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM stu107
+WHERE stu107_01=#{stuid,jdbcType=VARCHAR}
+<if test="type != null and type !=''" >
+AND type=#{type,jdbcType=VARCHAR}
+</if>
+<if test="phrase_id != null and phrase_id !=''" >
+AND stu107_02=#{phrase_id,jdbcType=VARCHAR}
+</if>
+</select>
+<select id="countByPhrase" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM k103
+WHERE type=#{type,jdbcType=VARCHAR}
+AND k103_06='phrase'
+</select>
+
+<!-- 课文 -->
+<!-- 保存课文学习录音 -->
+<insert id="saveLearnText" parameterType="java.util.Map">
+insert into stu106
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu106_01,
+</if>
+<if test="text_id != null and text_id !=''" >
+stu106_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu106_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu106_04,
+</if>
+<if test="type != null and type !=''" >
+type,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="text_id != null and text_id !=''" >
+#{text_id,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+<if test="type != null and type !=''" >
+#{type,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!--根据text_id,stuid判断是否存在此学习课文  -->
+<select id="findLearnByText"  resultType="java.util.Map">
+SELECT 
+s.stu106_03 learn_video,
+s.stu106_04 learn_score,
+s.type
+FROM stu106 s
+WHERE s.stu106_01=#{stuid,jdbcType=VARCHAR}
+AND s.stu106_02=#{text_id,jdbcType=VARCHAR}
+</select>
+<!-- 若存在替换为新录音;判断评分是否为最高 -->
+<update id="updateLearnByText" parameterType="java.util.Map">
+update stu106
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu106_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu106_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE stu106_01=#{stuid,jdbcType=VARCHAR}
+AND stu106_02=#{text_id,jdbcType=VARCHAR}
+</update>
+<!-- 统计本单元下的用户的学习课文情况 -->
+<select id="countByLearnByText" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM stu106
+WHERE stu106_01=#{stuid,jdbcType=VARCHAR}
+<if test="type != null and type !=''" >
+AND type=#{type,jdbcType=VARCHAR}
+</if>
+<if test="text_id != null and text_id !=''" >
+AND stu106_02=#{text_id,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 统计本单元下的所有课文 -->
+<select id="countByText" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM k102
+WHERE type=#{type,jdbcType=VARCHAR}
+</select>
+
+<!-- 对话 -->
+<!-- 统计此用户下的本单元的学习对话 -->
+<select id="countByLearnTalkName" resultType="java.lang.Integer">
+SELECT COUNT(*)
+FROM stu104
+WHERE type=#{type,jdbcType=VARCHAR}
+AND stu104_01=#{stuid,jdbcType=VARCHAR}
+</select>
+<!-- 统计本单元下的对话 -->
+<select id="countByTalkName" resultType="java.lang.Integer">
+SELECT COUNT(*)
+FROM k107
+WHERE type=#{type,jdbcType=VARCHAR}
+</select>
+<!-- 此对话下的学习角色 -->
+<select id="countByLearnTalkJs" resultType="java.lang.Integer">
+SELECT COUNT(*)
+FROM stu105
+WHERE stu105_01=#{talk_id,jdbcType=VARCHAR}
+AND stu105_05=#{stuid,jdbcType=VARCHAR}
+</select>
+<!-- 统计此对话下的所有对话 -->
+<select id="countByTalkJs" resultType="java.lang.Integer">
+SELECT COUNT(*)
+FROM k108
+WHERE k108_01=#{talk_id,jdbcType=VARCHAR}
+</select>
+<!-- 保存角色学习-->
+<insert id="saveLearnJS" parameterType="java.util.Map">
+insert into stu105
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="talk_id != null and talk_id !=''" >
+stu105_01,
+</if>
+<if test="juese_id != null and juese_id !=''" >
+stu105_02,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu105_03,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu105_04,
+</if>
+<if test="stuid != null and stuid !=''" >
+stu105_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="talk_id != null and talk_id !=''" >
+#{talk_id,jdbcType=VARCHAR},
+</if>
+<if test="juese_id != null and juese_id !=''" >
+#{juese_id,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!-- 根据juese_id;stuid判断是否存在 -->
+<select id="findLearnByTalk" resultType="java.util.Map">
+SELECT
+stu105_03 learn_score,
+stu105_04 learn_video
+FROM stu105
+WHERE stu105_05=#{stuid,jdbcType=VARCHAR}
+<if test="juese_id != null and juese_id !=''" >
+AND stu105_02=#{juese_id,jdbcType=VARCHAR}
+</if>
+<if test="talk_id != null and talk_id !=''" >
+AND stu105_01=#{talk_id,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 若存在替换为新录音;判断评分是否为最高 -->
+<update id="updateLearnByJS" parameterType="java.util.Map">
+update stu105
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu105_04 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu105_03 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE stu105_05=#{stuid,jdbcType=VARCHAR}
+AND stu105_02=#{juese_id,jdbcType=VARCHAR}
+</update>
+<!-- 查询一个对话下的录音 -->
+<select id="findAllByLearnTalk" resultType="java.util.Map">
+SELECT 
+k.k108_04 juese_yw,
+k.`k108_05` juese_video,
+s.`stu105_03` learn_score,
+s.stu105_02 juese_id,
+s.`stu105_04` learn_video
+FROM stu105 s,k108 k
+WHERE k.id=s.`stu105_02`
+AND s.stu105_01=#{talk_id,jdbcType=VARCHAR}
+AND s.`stu105_05`=#{stuid,jdbcType=VARCHAR}
+ORDER BY k.ids
+</select>
+
+<!-- 句子 -->
+<!-- 统计一个句子名称下的句子、每个句子 -->
+<select id="countByLearnSentence" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM stu108
+WHERE stu108_01=#{stuid,jdbcType=VARCHAR}
+<if test="sentence_sid != null and sentence_sid !=''" >
+ AND stu108_02= #{sentence_sid,jdbcType=VARCHAR}
+</if>
+<if test="sentence_id != null and sentence_id !=''" >
+ AND stu108_05= #{sentence_id,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 统计juzi名称下的句子 -->
+<select id="countBySentence" resultType="java.lang.Integer">
+SELECT 
+COUNT(*)
+FROM k104
+WHERE k104_01=#{sentence_id,jdbcType=VARCHAR}
+</select>
+<!-- 根据句子id和stuid -->
+<select id="findLearnSentence" resultType="java.util.Map">
+SELECT
+stu108_03 learn_video,
+stu108_04 learn_score
+FROM stu108
+WHERE stu108_01 =#{stuid,jdbcType=VARCHAR}
+AND stu108_02=#{sentence_sid,jdbcType=VARCHAR}
+</select>
+<!-- 保存学习句子 -->
+<insert id="saveLearnSentence" parameterType="java.util.Map">
+insert into stu108
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu108_01,
+</if>
+<if test="sentence_sid != null and sentence_sid !=''" >
+stu108_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+stu108_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+stu108_04,
+</if>
+<if test="sentence_id != null and sentence_id !=''" >
+stu108_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="sentence_sid != null and sentence_sid !=''" >
+#{sentence_sid,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=VARCHAR},
+</if>
+<if test="sentence_id != null and sentence_id !=''" >
+#{sentence_id,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+
+<update id="updateLearnSentence" parameterType="java.util.Map">
+update stu108
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu108_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu108_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+WHERE stu108_01 =#{stuid,jdbcType=VARCHAR}
+AND stu108_02=#{sentence_sid,jdbcType=VARCHAR}
+</update>
+
+<!-- 阅读 -->
+<insert id="saveLearnRead" parameterType="java.util.Map">
+insert into stu110
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu110_01,
+</if>
+<if test="read_id != null and read_id !=''" >
+stu110_02,
+</if>
+<if test="score != null and score !=''" >
+stu110_03,
+</if>
+<if test="stu110_04 != null and stu110_04 !=''" >
+stu110_04,
+</if>
+<if test="type != null and type !=''" >
+type,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="read_id != null and read_id !=''" >
+#{read_id,jdbcType=VARCHAR},
+</if>
+<if test="score != null and score !=''" >
+#{score,jdbcType=VARCHAR},
+</if>
+<if test="stu110_04 != null and stu110_04 !=''" >
+#{stu110_04,jdbcType=VARCHAR},
+</if>
+<if test="type != null and type !=''" >
+#{type,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+
+<insert id="saveLearnAnswer" parameterType="java.util.Map">
+insert into stu111
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu111_01,
+</if>
+<if test="read_qid != null and read_qid !=''" >
+stu111_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+ stu111_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+  stu111_04,
+</if>
+<if test="read_id != null and read_id !=''" >
+stu111_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="read_qid != null and read_qid !=''" >
+#{read_qid,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+<if test="read_id != null and read_id !=''" >
+#{read_id,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!-- 修改阅读学习 -->
+<update id="updateLearnRead" parameterType="java.util.Map"> 
+update stu110
+ <set>
+<if test="score != null and score !=''" >
+stu110_03 = #{score,jdbcType=VARCHAR},
+</if>
+<if test="stu110_04 != null and stu110_04 !=''" >
+stu110_04 = #{stu110_04,jdbcType=VARCHAR},
+</if>
+<if test="type != null and type !=''" >
+type = #{type,jdbcType=VARCHAR},
+</if>
+ </set>
+WHERE stu110_01 =#{stuid,jdbcType=VARCHAR}
+AND stu110_02=#{read_id,jdbcType=VARCHAR}
+</update>
+<!-- 修改阅读答案 -->
+<update id="updateLearnAnswer" parameterType="java.util.Map">
+update stu111
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu111_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu111_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+WHERE stu111_01 =#{stuid,jdbcType=VARCHAR}
+AND stu111_02=#{read_qid,jdbcType=VARCHAR}
+</update>
+<!-- 根据阅读id和stuid和type -->
+<select id="findLearnRead" resultType="java.util.Map">
+SELECT
+stu110_03 score,
+stu110_04
+FROM stu110
+WHERE
+stu110_01=#{stuid,jdbcType=VARCHAR}
+AND stu110_02=#{read_id,jdbcType=VARCHAR}
+AND type=#{type,jdbcType=VARCHAR}
+</select>
+<!-- 根据答案id和stuid -->
+<select id="findLearnAnswer" resultType="java.util.Map">
+SELECT
+stu111_03 learn_video,
+stu111_04 learn_score
+FROM stu111
+WHERE
+stu111_01=#{stuid,jdbcType=VARCHAR}
+AND stu111_02=#{read_qid,jdbcType=VARCHAR}
+</select>
+<!--  -->
+<select id="countLearnRead" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM stu110
+WHERE
+stu110_01=#{stuid,jdbcType=VARCHAR}
+AND type=#{type,jdbcType=VARCHAR}
+</select>
+<select id="countLearnAnswer" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM stu111
+WHERE
+stu111_01=#{stuid,jdbcType=VARCHAR}
+AND stu111_05=#{read_id,jdbcType=VARCHAR}
+</select>
+<select id="countRead" resultType="java.lang.Integer">
+select count(*)
+from k106
+where type=#{type,jdbcType=VARCHAR}
+</select>
+<select id="countAnswer" resultType="java.lang.Integer">
+select count(*)
+from k116
+where k116_01=#{read_id,jdbcType=VARCHAR}
+</select>
+<select id="findLearnReadID"  resultType="java.util.Map">
+SELECT
+stu111_02 read_qid,
+stu111_03 learn_video,
+stu111_04 learn_score
+FROM stu111
+WHERE
+stu111_01=#{stuid,jdbcType=VARCHAR}
+AND stu111_05=#{read_id,jdbcType=VARCHAR}
+</select>
+
+<!-- 听力 -->
+<insert id="saveLearnListen" parameterType="java.util.Map">
+insert into stu112
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu112_01,
+</if>
+<if test="listen_id != null and listen_id !=''" >
+stu112_02,
+</if>
+<if test="score != null and score !=''" >
+stu112_03,
+</if>
+<if test="listen_type != null and listen_type !=''" >
+stu112_04,
+</if>
+<if test="type != null and type !=''" >
+type,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="listen_id != null and listen_id !=''" >
+#{listen_id,jdbcType=VARCHAR},
+</if>
+<if test="score != null and score !=''" >
+#{score,jdbcType=VARCHAR},
+</if>
+<if test="listen_type != null and listen_type !=''" >
+#{listen_type,jdbcType=VARCHAR},
+</if>
+<if test="type != null and type !=''" >
+#{type,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<insert id="saveLearnListenAnswer" parameterType="java.util.Map">
+insert into stu113
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+stu113_01,
+</if>
+<if test="listen_questId != null and listen_questId !=''" >
+stu113_02,
+</if>
+<if test="learn_video != null and learn_video !=''" >
+ stu113_03,
+</if>
+<if test="learn_score != null and learn_score !=''" >
+  stu113_04,
+</if>
+<if test="listen_id != null and listen_id !=''" >
+stu113_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="listen_questId != null and listen_questId !=''" >
+#{listen_questId,jdbcType=VARCHAR},
+</if>
+<if test="learn_video != null and learn_video !=''" >
+#{learn_video,jdbcType=VARCHAR},
+</if>
+<if test="learn_score != null and learn_score !=''" >
+#{learn_score,jdbcType=DOUBLE},
+</if>
+<if test="listen_id != null and listen_id !=''" >
+#{listen_id,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+
+<update id="updateLearnListen" parameterType="java.util.Map"> 
+update stu112
+ <set>
+<if test="score != null and score !=''" >
+stu112_03 = #{score,jdbcType=VARCHAR},
+</if>
+<if test="type != null and type !=''" >
+type = #{type,jdbcType=VARCHAR},
+</if>
+ </set>
+WHERE stu112_01 =#{stuid,jdbcType=VARCHAR}
+AND stu112_02=#{listen_id,jdbcType=VARCHAR}
+AND stu112_04 = #{listen_type,jdbcType=VARCHAR}
+</update>
+<!-- 修改听力答案 -->
+<update id="updateLearnListenAnswer" parameterType="java.util.Map">
+update stu113
+ <set>
+ <if test="learn_video != null and learn_video !=''" >
+  stu113_03 = #{learn_video,jdbcType=VARCHAR},
+</if>
+ <if test="learn_score != null and learn_score !=''" >
+  stu113_04 = #{learn_score,jdbcType=DOUBLE},
+</if>
+ </set>
+WHERE stu113_01 =#{stuid,jdbcType=VARCHAR}
+AND stu113_02=#{listen_questId,jdbcType=VARCHAR}
+</update>
+<!-- 根据听力id和stuid和type -->
+<select id="findLearnListen" resultType="java.util.Map">
+SELECT
+stu112_03 score,
+stu112_04
+FROM stu112
+WHERE
+stu112_01=#{stuid,jdbcType=VARCHAR}
+AND stu112_02=#{listen_id,jdbcType=VARCHAR}
+AND type=#{type,jdbcType=VARCHAR}
+</select>
+<!-- 根据答案id和stuid -->
+<select id="findLearnListenAnswer" resultType="java.util.Map">
+SELECT
+stu113_03 learn_video,
+stu113_04 learn_score
+FROM stu113
+WHERE
+stu113_01=#{stuid,jdbcType=VARCHAR}
+AND stu113_02=#{listen_questId,jdbcType=VARCHAR}
+AND stu113_05=#{listen_id,jdbcType=VARCHAR}
+</select>
+<!--  -->
+<select id="countLearnListen" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM stu112
+WHERE
+stu112_01=#{stuid,jdbcType=VARCHAR}
+AND type=#{type,jdbcType=VARCHAR}
+AND stu112_04 = #{listen_type,jdbcType=VARCHAR}
+</select>
+<select id="countLearnListenAnswer" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM stu113
+WHERE
+stu113_01=#{stuid,jdbcType=VARCHAR}
+AND stu113_05=#{listen_id,jdbcType=VARCHAR}
+</select>
+<select id="countListen" resultType="java.lang.Integer">
+select count(*)
+from k101
+where type=#{type,jdbcType=VARCHAR}
+AND K101_02 =#{listen_type,jdbcType=VARCHAR}
+</select>
+<select id="countListenAnswer" resultType="java.lang.Integer">
+select count(*)
+from k110
+where k110_02=#{listen_id,jdbcType=VARCHAR}
+</select>
+<select id="findLearnListenID"  resultType="java.util.Map">
+SELECT
+stu113_02 listen_questId,
+stu113_03 learn_video,
+stu113_04 learn_score
+FROM stu113
+WHERE
+stu113_01=#{stuid,jdbcType=VARCHAR}
+AND stu113_05=#{listen_id,jdbcType=VARCHAR}
+AND stu113_02=#{listen_questId,jdbcType=VARCHAR}
+</select>
+</mapper>

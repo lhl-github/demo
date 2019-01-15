@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.kwld.dao.Talk_di" >
+<!-- 对话名称增加 -->
+  <insert id="addTalkName" parameterType="java.util.Map" >
+    insert into k107
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="dhid != null and dhid !=''" >
+        id,
+      </if>
+      <if test="dhname != null and dhname !=''" >
+        k107_02,
+      </if>
+      <if test="photoes != null and photoes !=''" >
+        k107_03,
+      </if>
+      <if test="type != null and type !=''" >
+        type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="dhid != null and dhid !=''" >
+        #{dhid,jdbcType=VARCHAR},
+      </if>
+      <if test="dhname != null and dhname !=''" >
+        #{dhname,jdbcType=VARCHAR},
+      </if>
+       <if test="photoes != null and photoes !=''" >
+         #{photoes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 对话的增加 -->
+   <insert id="addTalk" parameterType="java.util.Map" >
+    insert into k108
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null and id !=''" >
+        id,
+      </if>
+      <if test="dhid != null and dhid !=''" >
+        k108_01,
+      </if>
+      <if test="jsname != null and jsname !=''" >
+        k108_02,
+      </if>
+      <if test="zw != null and zw !=''" >
+        k108_03,
+      </if>
+      <if test="yw != null and yw !=''" >
+        k108_04,
+      </if>
+      <if test="video != null and video !=''" >
+        k108_05,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null and id !=''" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="dhid != null and dhid !=''" >
+        #{dhid,jdbcType=VARCHAR},
+      </if>
+      <if test="jsname != null and jsname !=''" >
+        #{jsname,jdbcType=VARCHAR},
+      </if>
+      <if test="zw != null and zw !=''" >
+        #{zw,jdbcType=VARCHAR},
+      </if>
+      <if test="yw != null and yw !=''" >
+        #{yw,jdbcType=VARCHAR},
+      </if>
+      <if test="video != null and video !=''" >
+        #{video,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 对话名称的删除 -->
+  <delete id="delTalkName" parameterType="java.util.Map" >
+    delete from k107
+    where id = #{dhid,jdbcType=VARCHAR}
+  </delete>
+  <!-- 对话的删除 -->
+   <delete id="delTalkById" parameterType="java.util.Map" >
+    delete from k108
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <!-- 根据对话名称ID对话的删除 -->
+   <delete id="delTalk" parameterType="java.util.Map" >
+    delete from k108
+    where k108_01 = #{dhid,jdbcType=VARCHAR}
+  </delete>
+  <!-- 对话名称的修改 -->
+    <update id="updateTalkName" parameterType="java.util.Map" >
+    update k107
+    <set >
+      <if test="dhname != null and dhname !=''" >
+        k107_02 = #{dhname,jdbcType=VARCHAR},
+      </if>
+      <if test="photoes != null and photoes !=''" >
+          k107_03 = #{photoes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{dhid,jdbcType=VARCHAR}
+  </update>
+  <!-- 对话的修改 -->
+    <update id="updateTalk" parameterType="java.util.Map" >
+    update k108
+    <set >
+      <if test="dhid != null and dhid !=''" >
+        k108_01 = #{dhid,jdbcType=VARCHAR},
+      </if>
+      <if test="jsname != null and jsname !=''" >
+        k108_02 = #{jsname,jdbcType=VARCHAR},
+      </if>
+      <if test="zw != null and zw !=''" >
+        k108_03 = #{zw,jdbcType=VARCHAR},
+      </if>
+      <if test="yw != null and yw !=''" >
+        k108_04 = #{yw,jdbcType=VARCHAR},
+      </if>
+       <if test="video != null and video !=''" >
+        k108_05 = #{video,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <!-- 根据对话名称ID进行查询对话 -->
+   <select id="findByTalkByTid" resultType="java.util.Map">
+     
+ SELECT
+ k2.id dhid,
+ k2.k107_02 dhname,
+ k2.k107_03 photoes,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t02` AND d111_05='43') xd,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy,
+ t.`t03` nj_d,
+ t.`t04` sxc_d,
+ t.`t05` dy_d,
+ t.`t06` photo
+FROM k107 k2,texttype t
+WHERE
+ k2.`type`=t.`type`
+<if test="dhid !=null and dhid !=''">
+AND k2.`id`=#{dhid,jdbcType=VARCHAR}
+</if>
+<if test="jclx !=null and jclx !=''">
+AND t.`t01`=#{jclx,jdbcType=VARCHAR}
+</if>
+<if test="xd !=null and xd !=''">
+AND t.`t02`=#{xd,jdbcType=VARCHAR}
+</if>
+<if test="nj !=null and nj !=''">
+AND t.`t03`=#{nj,jdbcType=VARCHAR}
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.`t04`=#{sxc,jdbcType=VARCHAR}
+</if>
+<if test="dy !=null and dy !=''">
+AND t.`t05`=#{dy,jdbcType=VARCHAR}
+</if>
+order by k2.type
+  </select>
+  
+ <select id="findByTk" resultType="java.util.Map">
+ SELECT k108_01 dhid,
+k108_02 jsname,
+k108_03 zw,
+k108_04 yw,
+k108_05 video,
+ids,
+id
+FROM k108 
+WHERE k108_01=#{dhid,jdbcType=VARCHAR}
+order by ids
+ </select> 
+  
+  
+    <select id="findByTalk" resultType="java.util.Map">
+     
+ SELECT
+ k2.id dhid,
+ k2.k107_02 dhname,
+ k2.k107_03 photoes,
+ k1.k108_02 jsname,
+ k1.k108_03 zw,
+ k1.k108_04 yw,
+ k1.ids,
+ k1.id id,
+ k1.k108_05 video,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t02` AND d111_05='43') xd,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy,
+ t.`t06` photo
+FROM k108 k1,k107 k2,texttype t
+WHERE
+k2.`id`=k1.`k108_01`
+AND  k2.`type`=t.`type`
+<if test="dhid !=null and dhid !=''">
+AND k2.`id`=#{dhid,jdbcType=VARCHAR}
+</if>
+<if test="jclx !=null and jclx !=''">
+AND t.`t01`=#{jclx,jdbcType=VARCHAR}
+</if>
+<if test="xd !=null and xd !=''">
+AND t.`t02`=#{xd,jdbcType=VARCHAR}
+</if>
+<if test="nj !=null and nj !=''">
+AND t.`t03`=#{nj,jdbcType=VARCHAR}
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.`t04`=#{sxc,jdbcType=VARCHAR}
+</if>
+<if test="dy !=null and dy !=''">
+AND t.`t05`=#{dy,jdbcType=VARCHAR}
+</if>
+ <if test="jsname != null and jsname !=''" >
+AND k1.k108_02 = #{jsname,jdbcType=VARCHAR}
+</if>
+<if test="zw != null and zw !=''" >
+AND k1.k108_03 = #{zw,jdbcType=VARCHAR}
+ </if>
+<if test="yw != null and yw !=''" >
+AND k1.k108_04 = #{yw,jdbcType=VARCHAR}
+</if>
+<if test="type != null and type !=''" >
+AND k2.type = #{type,jdbcType=VARCHAR}
+</if>
+<if test="video != null and video !=''" >
+AND k1.k108_05 = #{video,jdbcType=VARCHAR}
+</if>
+order by k2.type
+  </select>
+  
+  <select id="findByID" resultType="java.util.Map">
+  SELECT 
+  k.id dhid,
+  k.k107_02 dhname,
+  k.k107_03 photo,
+  k.type,
+   t.`t01` jclx,
+ t.`t02` xd,
+ t.`t03` nj,
+ t.`t04` sxc,
+ t.`t05` dy,
+  t.`t06` photo
+FROM 
+  k107 k,texttype t
+WHERE k.id=#{dhid,jdbcType=VARCHAR}
+AND k.type=t.type
+  </select>
+</mapper>

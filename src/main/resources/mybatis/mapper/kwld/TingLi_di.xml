@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xljy.kwld.dao.TingLi_di">
+	<!-- 约定: _d代码 _m名称 -->
+	<!-- 目的：为dao接口方法提供sql语句配置 -->
+
+
+	<select id="findall" resultType="java.util.Map">
+		SELECT
+		Id tingli_id,
+		k101_01 tingli_biaoti,
+		k101_02 tingli_type_d,
+		(case
+		when k101_02='1'then '听选题' when k101_02='2'then '听填题' end)
+		tingli_type_m,
+		k101_03 tingli_timu,
+		k101_04 tingli_yinpin,
+		
+		k101_05 tingli_miaoshu,
+		k101_06 tingli_yaoqiu,
+		k101_07 tingli_wenbenneirong,
+		
+		k101.type kewen_id,
+		texttype.t01 jiaocaileixing_d,
+		(select d111_01 from d111 where d111_02='教材类型' and d111_03=texttype.t01) jiaocaileixing_m,
+		texttype.t02 xueduan_d,
+		(select d111_01 from d111 where d111_02='学段' and d111_03= texttype.t02) xueduan_m,
+		texttype.t03 nianji_d,
+		(select d111_01 from d111 where d111_02='年级' and d111_03= texttype.t03) nianji_m,
+		texttype.t04 shangxiace_d,
+		(select d111_01 from d111 where d111_02='上下册' and d111_03= texttype.t04) shangxiace_m,
+		texttype.t05 danyuan_d,
+		(select d111_01 from d111 where d111_02='单元' and d111_03= texttype.t05) danyuan_m,
+		texttype.t06 xuexiao_d,
+		(select d108_02 from d108 where d108_01= texttype.t06) xuexiao_m
+
+		FROM
+		k101
+		left join
+		texttype on k101.type=texttype.type
+		where 1=1
+
+		<if test="tingli_id != null and tingli_id !='' ">
+			and k101.Id = #{tingli_id}
+		</if>
+		<if test="tingli_biaoti != null and tingli_biaoti !='' ">
+			and k101.k101_01 like CONCAT('%',#{tingli_biaoti},'%')
+		</if>
+		<if test="tingli_type_d != null and tingli_type_d !='' ">
+			and k101.k101_02 = #{tingli_type_d}
+		</if>
+		<if test="tingli_timu != null and tingli_timu !='' ">
+			and k101.k101_03 like CONCAT('%',#{tingli_timu},'%')
+		</if>
+		<if test="kewen_id != null and kewen_id !='' ">
+			and k101.type = #{kewen_id}
+		</if>
+		<if test="tingli_yinpin != null and tingli_yinpin !='' ">
+			and k101.k101_04 = #{tingli_yinpin}
+		</if>
+		<if test="jiaocaileixing_d != null and jiaocaileixing_d !='' ">
+			and texttype.t01 = #{jiaocaileixing_d}
+		</if>
+		<if test="xueduan_d != null and xueduan_d !='' ">
+			and texttype.t02 = #{xueduan_d}
+		</if>
+		<if test="nianji_d != null and nianji_d !='' ">
+			and texttype.t03 = #{nianji_d}
+		</if>
+		<if test="shangxiace_d != null and shangxiace_d !='' ">
+			and texttype.t04 = #{shangxiace_d}
+		</if>
+		<if test="danyuan_d != null and danyuan_d !='' ">
+			and texttype.t05 = #{danyuan_d}
+		</if>
+		<if test="xuexiao_d != null and xuexiao_d !='' ">
+			and texttype.t06 = #{xuexiao_d}
+		</if>
+
+
+	</select>
+
+
+	<select id="Find_allwenti" resultType="java.util.Map">
+
+		SELECT
+		Id wenti_id,
+		k110_01 wentiming,
+		K110_03 wentineirong,
+		k110_05 zhengquedaan,
+		k110_06 daanjiexi,
+		k110_07 wenti_yinpin
+		
+		FROM
+		k110
+		where 1=1
+
+		and k110_02 = #{tingli_id}
+		order by order_00 
+
+
+	</select>
+
+	<select id="Find_allwentixuanxiang" resultType="java.util.Map">
+		SELECT
+		Id xuanxiang_id,
+		k111_01 xuanxiangbiaoqian,
+		k111_02 xuanxiangneirong,
+		k111_04 xuanxiang_tupian,
+		k111_05 xuanxiang_yinpin
+		FROM
+		k111
+		where 1=1
+		and k111_03 = #{wenti_id}
+		order by Id
+		
+	</select>
+
+
+	<select id="find_kewendanyuan" resultType="java.util.Map">
+
+		SELECT
+		TYPE kewen_id,
+		t01 jiaocaileixing_d,
+		t02 xueduan_d,
+		t03 nianji_d,
+		t04 shangxiace_d,
+		t05 danyuan_d,
+		t06 xuexiao_d
+		FROM
+		texttype
+		where 1=1
+
+		<if test="jiaocaileixing_d != null and jiaocaileixing_d !='' ">
+			and texttype.t01 = #{jiaocaileixing_d}
+		</if>
+		<if test="xueduan_d != null and xueduan_d !='' ">
+			and texttype.t02 = #{xueduan_d}
+		</if>
+		<if test="nianji_d != null and nianji_d !='' ">
+			and texttype.t03 = #{nianji_d}
+		</if>
+		<if test="shangxiace_d != null and shangxiace_d !='' ">
+			and texttype.t04 = #{shangxiace_d}
+		</if>
+		<if test="danyuan_d != null and danyuan_d !='' ">
+			and texttype.t05 = #{danyuan_d}
+		</if>
+		<if test="xuexiao_d != null and xuexiao_d !='' ">
+			and texttype.t06 = #{xuexiao_d}
+		</if>
+
+
+	</select>
+
+	<!--insert 增加 useGeneratedKeys,keyProperty 返回主键集合 useGeneratedKeys：必须设置为true，否则无法获取到主键id。 
+		keyProperty：设置为POJO对象的主键id属性名称。 keyColumn：设置为数据库记录的主键id字段名称 -->
+	<insert id="addtest" parameterType="com.xljy.bean.testlhl"
+		useGeneratedKeys="true" keyProperty="id">
+
+		insert into test_lhl (test_01)
+		values (#{app.test_01})
+		<!-- <foreach item="item" collection="app" separator=","> (#{item.test_01}) 
+			</foreach> -->
+	</insert>
+
+	<!-- 添加课文单元 -->
+	<insert id="add_kewendanyuan" parameterType="java.util.Map">
+
+		INSERT INTO texttype (
+		TYPE,
+		t01,
+		t02,
+		t03,
+		t04,
+		t05
+		<if test="map.xuexiao_d != null and map.xuexiao_d !='' ">
+			,t06
+		</if>
+
+		)
+		VALUES
+		(
+		#{uuid_kewendanyuan},
+		#{map.jiaocaileixing_d},
+		#{map.xueduan_d},
+		#{map.nianji_d},
+		#{map.shangxiace_d},
+		#{map.danyuan_d}
+		<if test="map.xuexiao_d != null and map.xuexiao_d !='' ">
+			,#{map.xuexiao_d}
+		</if>
+
+		)
+
+	</insert>
+
+
+	<!-- 添加听力 -->
+	<insert id="add_tingli">
+
+		INSERT INTO k101 (
+		Id,
+		<if test=" map.tingli_biaoti != null and map.tingli_biaoti !='' ">
+			k101_01,
+		</if>
+		<if test=" map.tingli_miaoshu != null and map.tingli_miaoshu !='' ">
+			k101_05,
+		</if>
+		<if test=" map.tingli_yaoqiu != null and map.tingli_yaoqiu !='' ">
+			k101_06,
+		</if>
+		<if
+			test=" map.tingli_wenbenneirong != null and map.tingli_wenbenneirong !='' ">
+			k101_07,
+		</if>
+
+		k101_02,
+		TYPE,
+		k101_03,
+		k101_04
+		)
+		VALUES
+		(
+		#{uuid_tingli},
+		<if test=" map.tingli_biaoti != null and map.tingli_biaoti !='' ">
+			#{map.tingli_biaoti},
+		</if>
+		<if test=" map.tingli_miaoshu != null and map.tingli_miaoshu !='' ">
+			#{map.tingli_miaoshu},
+		</if>
+		<if test=" map.tingli_yaoqiu != null and map.tingli_yaoqiu !='' ">
+			#{map.tingli_yaoqiu},
+		</if>
+		<if
+			test=" map.tingli_wenbenneirong != null and map.tingli_wenbenneirong !='' ">
+			#{map.tingli_wenbenneirong},
+		</if>
+
+		#{map.tingli_type_d},
+		#{uuid_kewendanyuan},
+		#{map.tingli_timu},
+		#{map.tingli_yinpin}
+		)
+
+	</insert>
+
+	<!-- 添加听力问题 -->
+	<insert id="add_wenti">
+		INSERT INTO k110 (
+		Id,
+		<if test=" map.wentiming != null and map.wentiming !='' ">
+			k110_01,
+		</if>
+
+		<if test=" map.zhengquedaan != null and map.zhengquedaan !='' ">
+			k110_05,
+		</if>
+
+		<if test=" map.daanjiexi != null and map.daanjiexi !='' ">
+			k110_06,
+		</if>
+		<if test=" map.wenti_yinpin != null and map.wenti_yinpin !='' ">
+			k110_07,
+		</if>
+
+		k110_02,
+		K110_03,
+		k110_04
+
+
+		)
+		VALUES
+		(
+		#{uuid_wenti},
+		<if test=" map.wentiming != null and map.wentiming !='' ">
+			#{map.wentiming},
+		</if>
+		<if test=" map.zhengquedaan != null and map.zhengquedaan !='' ">
+			#{map.zhengquedaan},
+		</if>
+		<if test=" map.daanjiexi != null and map.daanjiexi !='' ">
+			#{map.daanjiexi},
+		</if>
+		<if test=" map.wenti_yinpin != null and map.wenti_yinpin !='' ">
+			#{map.wenti_yinpin},
+		</if>
+
+		#{uuid_tingli},
+		#{map.wentineirong},
+		#{timudalei}
+
+		)
+
+	</insert>
+
+
+	<!-- 添夹问题选项 -->
+	<insert id="add_wenti_xuanxiang">
+		INSERT INTO k111
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if
+				test="map.xuanxiangbiaoqian != null and map.xuanxiangbiaoqian !=''">
+				k111_01,
+			</if>
+			<if
+				test="map.xuanxiangneirong != null and map.xuanxiangneirong !=''">
+				k111_02,
+			</if>
+			<if
+				test="map.xuanxiang_tupian != null and map.xuanxiang_tupian !=''">
+				k111_04,
+			</if>
+			<if
+				test="map.xuanxiang_yinpin != null and map.xuanxiang_yinpin !=''">
+				k111_05,
+			</if>
+			<if test="uuid_wenti != null and uuid_wenti !=''">
+				k111_03,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if
+				test="map.xuanxiangbiaoqian != null and map.xuanxiangbiaoqian !=''">
+				#{map.xuanxiangbiaoqian,jdbcType=VARCHAR},
+			</if>
+			<if
+				test="map.xuanxiangneirong != null and map.xuanxiangneirong !=''">
+				#{map.xuanxiangneirong,jdbcType=VARCHAR},
+			</if>
+			<if
+				test="map.xuanxiang_tupian != null and map.xuanxiang_tupian !=''">
+				#{map.xuanxiang_tupian,jdbcType=VARCHAR},
+			</if>
+			<if
+				test="map.xuanxiang_yinpin != null and map.xuanxiang_yinpin !=''">
+				#{map.xuanxiang_yinpin,jdbcType=VARCHAR},
+			</if>
+			<if test="uuid_wenti != null and uuid_wenti !=''">
+				#{uuid_wenti,jdbcType=VARCHAR},
+			</if>
+		</trim>
+
+
+	</insert>
+
+
+
+	<update id="xiugai_tingli">
+		UPDATE
+		k101
+		SET
+		<if test=" tingli_biaoti != null and tingli_biaoti !='' ">
+			k101_01 = #{tingli_biaoti},
+		</if>
+
+		<!-- k101_02 = #{tingli_type_d}, -->
+		k101_03 = #{tingli_timu},
+		k101_04 = #{tingli_yinpin},
+		k101_05 =#{tingli_miaoshu},                                               
+		k101_06 =#{tingli_yaoqiu},                                   
+		k101_07 =#{tingli_wenbenneirong}  
+		WHERE Id = #{tingli_id}
+	</update>
+
+
+	<update id="xiugai_wenti">
+
+		UPDATE
+		k110
+		SET
+		<if test=" wentiming != null and wentiming !='' ">
+			k110_01 = #{wentiming},
+		</if>
+		<if test=" zhengquedaan != null and zhengquedaan !='' ">
+			k110_05 = #{zhengquedaan},
+		</if>
+		<if test=" daanjiexi != null and daanjiexi !='' ">
+			k110_06 = #{daanjiexi},
+		</if>
+
+		K110_03 = #{wentineirong}
+
+		WHERE Id = #{wenti_id}
+
+	</update>
+
+	<update id="xiugai_wenti_xuanxiang">
+		UPDATE
+		k111
+		<set>
+			<if test=" xuanxiangbiaoqian != null and xuanxiangbiaoqian !='' ">k111_01 = #{xuanxiangbiaoqian},</if>
+			<if test=" xuanxiangneirong != null and xuanxiangneirong !='' ">k111_02 = #{xuanxiangneirong},</if>
+			<if test=" xuanxiangtupian != null and xuanxiangtupian !='' ">k111_04 = #{xuanxiangtupian},</if>
+			<if test=" xuanxiangyinpin != null and xuanxiangyinpin !='' ">k111_05 = #{xuanxiangyinpin},</if>
+		</set>
+		WHERE Id = #{xuanxiang_id}
+
+
+	</update>
+
+
+	<delete id="del_wenti">
+		DELETE
+		FROM
+		k110
+		WHERE Id = #{wenti_id}
+
+	</delete>
+
+	<!-- 删除题下的所有问题 -->
+	<delete id="del_wenti_all">
+		DELETE
+		FROM
+		k110
+		WHERE k110_02 = #{ti_id}
+
+	</delete>
+
+	<delete id="del_wenti_xuanxiang">
+		DELETE
+		FROM
+		k111
+		WHERE Id = #{xuanxiang_id}
+
+	</delete>
+
+	<!-- 删除问题下所有的选项 -->
+	<delete id="del_wenti_xuanxiang_all">
+		DELETE
+		FROM
+		k111
+		WHERE k111_03 = #{wenti_id}
+
+	</delete>
+
+	<!-- 通过ti_id 删除所有选项 -->
+	<delete id="del_xuanxuang_all">
+		DELETE
+		FROM
+		k111
+		WHERE Id in (
+		select a.Id from (
+		select Id from k111 where k111_03 in (
+		select id from k110 where k110_02 = #{ti_id}
+		)
+		)a
+		)
+
+	</delete>
+
+	<delete id="del_ti_tingli">
+		DELETE
+		FROM
+		k101
+		WHERE Id = #{ti_id}
+
+	</delete>
+
+</mapper>

@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xljy.sys.dao.Login_di">
+	<!-- 目的：为dao接口方法提供sql语句配置 -->
+
+	<select
+		id="getLogUser"
+		parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		Id,
+		d101_01 user_m,
+		
+		<if test="usertype_code !=0 and  usertype_code !=5 ">
+			d101_12 user_dianhua,
+		</if>
+		<if test="usertype_code ==2 ">
+			d101_18 user_xueduan_d,
+			(select d111_01 from d111 where d111_02='学段' and d111_03= d101_18) user_xueduan_m,
+		</if>
+		<if test="usertype_code ==5 ">
+			<!-- 列合并行的 -->
+			(SELECT GROUP_CONCAT(d112_01) FROM d112 WHERE d112_02 =d1015.Id ) user_banji_d,
+		
+		</if>
+		
+		#{usertype_code} usertype_code,
+		(select d111_01 from d111 where d111_05='20' and d111_03= #{usertype_code}) yonghuleixing,
+		d101_03 zhanghao,
+		d101_04 diqu_d,
+		(select d106_02 from d106 where d106_01= d101_04) diqu_m,
+		d101_05 user_school_d,
+		(select d108_02 from d108 where d108_01=d101_05 ) user_school_m ,
+		d101_06 user_sex_d,
+		(select d111_01 from d111 where d111_02='性别' and d111_03= d101_06) user_sex_m,
+		CONCAT('user/',#{usertype_code},'/',Id,'/') user_savepath
+
+		FROM
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<!-- 老师 -->
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1
+
+		<if test="user_zhanghao != null and user_zhanghao !='' ">
+			and d101_03= #{user_zhanghao}
+		</if>
+		<if test="user_mima != null and user_mima !='' ">
+			and d101_11= #{user_mima}
+		</if>
+		<if test="user_dianhua != null and user_dianhua !='' ">
+			and d101_12= #{user_dianhua}
+		</if>
+		<if test="user_weixin_id != null and user_weixin_id !='' ">
+			and d101_17= #{user_weixin_id}
+		</if>
+	</select>
+
+	<select
+		id="getLogUser_shouji"
+		parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		Id,
+		d101_01 user_m,
+
+		<if test="usertype_code !=0 and  usertype_code !=5 ">
+			d101_12 user_dianhua,
+		</if>
+		<if test="usertype_code ==2 ">
+			d101_18 user_xueduan_d,
+			(select d111_01 from d111 where d111_02='学段' and d111_03= d101_18) user_xueduan_m,
+		</if>
+		
+		<if test="usertype_code ==5 ">
+			<!-- 列合并行的 -->
+			(SELECT GROUP_CONCAT(d112_01) FROM d112 WHERE d112_02 =d1015.Id ) user_banji_d,
+		
+		</if>
+
+		#{usertype_code} usertype_code,
+		(select d111_01 from d111 where d111_05='20' and d111_03= #{usertype_code}) yonghuleixing,
+		d101_03 zhanghao,
+		d101_04 diqu_d,
+		(select d106_02 from d106 where d106_01= d101_04) diqu_m,
+		d101_05 user_school_d,
+		(select d108_02 from d108 where d108_01=d101_05 ) user_school_m ,
+		d101_06 user_sex_d,
+		(select d111_01 from d111 where d111_02='性别' and d111_03= d101_06) user_sex_m,
+		d101_17 user_weixin_id,
+		CONCAT('user/',#{usertype_code},'/',Id,'/') user_savepath
+
+		FROM
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<!-- 老师 -->
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1
+
+		<if test="user_dianhua != null and user_dianhua !='' ">
+			and d101_12= #{user_dianhua}
+		</if>
+
+	</select>
+
+	<select
+		id="getLogUser_weixin"
+		parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		Id,
+		d101_01 user_m,
+		<if test="usertype_code !=0 and  usertype_code !=5 ">
+			d101_12 user_dianhua,
+		</if>
+		<if test="usertype_code ==2 ">
+			d101_18 user_xueduan_d,
+			(select d111_01 from d111 where d111_02='学段' and d111_03= d101_18) user_xueduan_m,
+		</if>
+		
+		<if test="usertype_code ==5 ">
+			<!-- 列合并行的 -->
+			(SELECT GROUP_CONCAT(d112_01) FROM d112 WHERE d112_02 =d1015.Id ) user_banji_d,
+		
+		</if>
+		
+		#{usertype_code} usertype_code,
+		(select d111_01 from d111 where d111_05='20' and d111_03= #{usertype_code}) yonghuleixing,
+		d101_03 zhanghao,
+		d101_04 diqu_d,
+		(select d106_02 from d106 where d106_01= d101_04) diqu_m,
+		d101_05 user_school_d,
+		(select d108_02 from d108 where d108_01=d101_05 ) user_school_m ,
+		d101_06 user_sex_d,
+		(select d111_01 from d111 where d111_02='性别' and d111_03= d101_06) user_sex_m,
+		d101_17 user_weixin_id,
+		CONCAT('user/',#{usertype_code},'/',Id,'/') user_savepath
+
+		FROM
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<!-- 老师 -->
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1 and d101_17= #{user_weixin_id}
+
+	</select>
+
+	<select
+		id="findjuese"
+		parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		id jueseid,
+		d102_01 jueseming
+		FROM
+		d102
+		where 1=1
+		and Id in (
+		select d104_02 from d104 where d104_01 =#{userid}
+		)
+
+
+	</select>
+	<select
+		id="findcaidan"
+		parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		id caidanid,
+		d103_01 caidanming,
+		d103_02 caidan_url,
+		d103_03 caidan_fuji
+		FROM
+		d103
+		where 1=1
+		and Id in (
+		select d105_02 from d105 where d105_01 in
+		<foreach
+			collection="juese"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item.jueseid}
+		</foreach>
+		)
+
+	</select>
+
+	<update
+		id="up_bd_weixin_id"
+		parameterType="java.util.Map">
+		update
+		<choose>
+			<when test="map.usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="map.usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="map.usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="map.usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="map.usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="map.usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		set
+		d101_17 = #{map.user_weixin_id}
+		where id = #{user_id}
+	</update>
+
+	<insert
+		id="zc_user"
+		parameterType="java.util.Map">
+		insert into
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+		</choose>
+
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				d101_03,
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+			<if test="user_weixin_id != null and user_weixin_id !=''">
+				d101_17,
+			</if>
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+			<if test="user_m != null and user_m !=''">
+				#{user_m},
+			</if>
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				#{user_zhanghao},
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma},
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d},
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d},
+			</if>
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua},
+			</if>
+			<if test="user_weixin_id != null and user_weixin_id !=''">
+				#{user_weixin_id},
+			</if>
+		</trim>
+	</insert>
+
+</mapper>

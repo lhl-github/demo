@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.parent.dao.BindStudent_di" >
+
+<!-- 根据pid查询该家长下的学生 -->
+<select id="findByPid" resultType="java.util.Map">
+SELECT d109_02 stuid,
+d1.`d101_01` stuName,
+d1.`d101_03` username,
+(SELECT d2.d108_02 FROM d108 d2 WHERE d2.d108_01=d1.d101_05) school,
+d1.`d101_14` memberState,
+DATE_FORMAT(d1.`d101_15`, '%Y-%m-%d') starttime,
+DATE_FORMAT(d1.`d101_16`, '%Y-%m-%d') endtime,
+d1.`d101_16` end,
+d101_37 stuTupian
+FROM d109 d,d1015 d1
+WHERE d.`d109_02` = d1.`Id`
+AND d.`d109_01`=#{pid}
+</select>
+
+<select id="findByStuid2" resultType="java.util.Map">
+SELECT d1.id stuid,
+d1.`d101_01` stuName,
+d1.`d101_03` username,
+(SELECT d2.d108_02 FROM d108 d2 WHERE d2.d108_01=d1.d101_05) school,
+d1.`d101_14` memberState,
+DATE_FORMAT(d1.`d101_15`, '%Y-%m-%d') starttime,
+DATE_FORMAT(d1.`d101_16`, '%Y-%m-%d') endtime,
+d1.`d101_16` end,
+d101_37 stuTupian
+FROM d1015 d1
+WHERE  d1.id=#{stuid}
+</select>
+
+<!-- 判断该学生是否班级 -->
+<select id="findByStuId" resultType="java.util.Map">
+SELECT 
+(SELECT d107_01 FROM d107 WHERE d107_03=d.d112_01) class,
+(SELECT (SELECT d2.d111_01 FROM d111 d2 WHERE d1.d107_04 = d2.d111_03 AND d2.d111_05='10') FROM d107 d1 WHERE d1.d107_03=d.d112_01 ) grade
+FROM d112 d
+WHERE d.d112_02=#{stuid}
+</select>
+
+<!-- 添加学生家长 -->
+<insert id="saveParStu" parameterType="java.util.Map">
+insert into d109
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="pid != null and pid !=''" >
+d109_01,
+</if>
+<if test="stuid != null and stuid !=''" >
+d109_02,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="pid != null and pid !=''" >
+#{pid,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+
+<!-- 添加新的学生帐号 -->
+<insert id="saveStuByPid" parameterType="java.util.Map">
+insert into d1015
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stuName != null and stuName !=''" >
+d101_01,
+</if>
+<if test="school_id != null and school_id !=''" >
+d101_05,
+</if>
+<if test="username != null and username !=''" >
+d101_03,
+</if>
+<if test="password != null and password !=''" >
+d101_11,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stuName != null and stuName !=''" >
+#{stuName,jdbcType=VARCHAR},
+</if>
+<if test="school_id != null and school_id !=''" >
+#{school_id,jdbcType=VARCHAR},
+</if>
+<if test="username != null and username !=''" >
+#{username,jdbcType=VARCHAR},
+</if>
+<if test="password != null and password !=''" >
+#{password,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+
+<!-- 本周作业报告 -->
+<!-- 作业总数 -->
+<select id="countOneWeekAll" resultType="java.util.Map">
+SELECT *
+FROM lishitable
+WHERE 1=1
+AND YEARWEEK(DATE_FORMAT(startTime,'%Y-%m-%d')) = YEARWEEK(NOW())
+AND stuid=#{stuid,jdbcType=VARCHAR}
+</select>
+<!-- 已完成数 -->
+<select id="countOneWeekFinish" resultType="java.util.Map">
+SELECT *
+FROM lishitable
+WHERE 1=1
+AND YEARWEEK(DATE_FORMAT(finishTime,'%Y-%m-%d')) = YEARWEEK(NOW())
+AND stuid=#{stuid,jdbcType=VARCHAR}
+AND finishCount !='0'
+
+</select>
+
+<!-- 作业的平均得分 -->
+<select id="findByScoreAll" resultType="java.util.Map">
+SELECT SUM(scoreAll) scoreAll
+FROM lishitable
+WHERE YEARWEEK(DATE_FORMAT(finishTime,'%Y-%m-%d')) = YEARWEEK(NOW())
+AND stuid=#{stuid,jdbcType=VARCHAR}
+</select>
+
+<!-- 班级排名 当天 -->
+<select id="classByRank" resultType="java.util.Map">
+SELECT scoreAll, stuid, 
+(@rowNum:=@rowNum+1) AS rank  
+
+FROM (SELECT 
+	SUM(h.`hw101_04`) scoreAll,
+	d.`d112_02` stuid
+
+	FROM hw101 h,d112 d
+	WHERE h.`hw101_02`=d.`d112_02`
+	AND TO_DAYS(h.hw101_05) = TO_DAYS(NOW())
+	AND d.`d112_01`=#{classId}
+	GROUP BY h.`hw101_02`
+	ORDER BY scoreAll DESC
+	)ss ,(SELECT (@rowNum :=0) ) b
+</select>
+<!-- 查询学生所在班级 -->
+<select id="findByClassId" resultType="java.util.Map">
+SELECT d.d112_01 classId,d2.`d107_01` class
+FROM d112 d,d107 d2
+WHERE d.d112_02=#{stuid,jdbcType=VARCHAR}
+AND d.`d112_01`=d2.`d107_03`
+</select>
+<!-- 班级作业排名 -->
+<select id="homeworkByRank" resultType="java.util.Map">
+SELECT scoreAll, student,stuid,touxiang,
+school,class,grade,
+(@rowNum:=@rowNum+1) AS rank  
+
+FROM (SELECT 
+	SUM(h.`hw101_04`) scoreAll,
+	d.`d112_02` stuid,
+        d1.`d101_01` student,
+       (SELECT d107_01 FROM d107 WHERE d107_03=d.d112_01) class,
+        (SELECT d2.d108_02 FROM d108 d2 WHERE d2.d108_01=d1.d101_05) school,
+        (SELECT (SELECT d2.d111_01 FROM d111 d2 WHERE d1.d107_04 = d2.d111_03 AND d2.d111_05='10') FROM d107 d1 WHERE d1.d107_03=d.d112_01 ) grade,
+        d1.`d101_37` touxiang
+	FROM hw101 h,d112 d,d1015 d1
+	WHERE h.`hw101_02`=d.`d112_02`
+	AND d.`d112_01`=#{classId}
+	AND h.`hw101_03`=#{hwid}
+	AND d1.id=d.`d112_02`
+	GROUP BY h.`hw101_02`
+	ORDER BY scoreAll DESC
+	)ss ,(SELECT (@rowNum :=0) ) b
+</select>
+<!-- 作业情况  详情页面 -->
+<!-- 按时间搜索 -->
+
+<!-- 本周班级排名 -->
+<select id="classWeekByRank" resultType="java.util.Map">
+SELECT scoreAll, stuid,d1.`d101_01` sutdent,d1.`d101_37` touxiang, 
+(@rowNum:=@rowNum+1) AS rank  
+
+FROM (SELECT 
+	SUM(h.scoreAll) scoreAll,h.stuid
+	FROM lishitable h,d112 d
+	WHERE h.stuid=d.`d112_02`
+	   AND YEARWEEK(DATE_FORMAT(h.finishTime,'%Y-%m-%d')) = YEARWEEK(NOW())
+	   AND d.`d112_01`=#{classId}
+	GROUP BY stuid
+	ORDER BY scoreAll DESC
+	)ss ,(SELECT (@rowNum :=0) ) b ,d1015 d1
+WHERE d1.`Id`=stuid	
+
+</select>
+
+<!-- 本周学习情况 -->
+<select id="findLearnByWeek" resultType="java.util.Map">
+
+</select>
+<!-- 本周作业统计及展示 -->
+<select id="findByWeekHwShow" resultType="java.util.Map">
+SELECT
+t.`t102_08` homeName,
+t.`t102_03` hwid
+FROM t102 t,d112 d
+WHERE YEARWEEK(DATE_FORMAT(t.`t102_04`,'%Y-%m-%d')) = YEARWEEK(NOW())
+AND t.`t102_02`=d.`d112_01`
+AND d.`d112_02`=#{stuid,jdbcType=VARCHAR}
+</select>
+<select id="findByStuHomework" resultType="java.util.Map">
+SELECT
+hw101_04 scoreAll,
+DATE_FORMAT(hw101_06, '%Y-%m-%d %T') finishTime
+FROM hw101
+WHERE YEARWEEK(DATE_FORMAT(hw101_06,'%Y-%m-%d')) = YEARWEEK(NOW())
+AND hw101_02=#{stuid,jdbcType=VARCHAR}
+<if test="hwid != null and hwid !=''">
+AND hw101_03=#{hwid,jdbcType=VARCHAR}
+</if>
+</select>
+
+<!-- 作业情况    音标 -->
+<select id="findBySymbolAll" resultType="java.util.Map">
+SELECT
+DISTINCT 
+CONCAT_WS('',(SELECT d.d111_01 FROM d111 d WHERE d.d111_03=yb1.yb100_02 AND d.d111_05='111'),yb1.yb100_01) content_title,
+DATE_FORMAT(stu.`stu102_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu102_05`, '%Y-%m-%d') startTime,
+SUM(stu.stu102_04) scoreAll,
+yb1.yb100_00 hwid
+FROM stu102 stu,yb100 yb1,yb101 yb2
+WHERE 
+stu.stu102_01 =#{stuid,jdbcType=VARCHAR}
+AND yb1.yb100_00 = yb2.yb101_06
+AND yb2.yb101_00 = stu.`stu102_02`
+GROUP BY yb1.yb100_01
+ORDER BY stu.`stu102_05` DESC
+</select>
+
+<!-- 作业详情     音标-->
+<select id="findBySymbolDetail" resultType="java.util.Map">
+SELECT DISTINCT
+stu102_02 yb_wordId,
+yb.`yb101_01` standard_example,
+yb.`yb101_02` standard_explain,
+yb.`yb101_04` standard_video,
+stu.`stu102_03` learn_video,
+stu.`stu102_04` learn_score
+FROM
+stu102 stu,yb101 yb
+WHERE stu.`stu102_02`=yb.`yb101_00`
+AND stu.`stu102_01`=#{stuid,jdbcType=VARCHAR}
+AND yb.`yb101_06` =#{hwid,jdbcType=VARCHAR}
+</select>
+
+<!-- 作业情况    单词 -->
+<select id="findByWordType" resultType="java.util.Map">
+SELECT DISTINCT
+(SELECT d.d111_01 FROM d111 d,texttype t WHERE d.d111_03=t.`t05` AND d.d111_05='31' AND t.`type` = stu.type) content_title,
+stu.`type` hwid,
+SUM(stu.`stu103_04`) scoreAll,
+DATE_FORMAT(stu.`stu103_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu103_05`, '%Y-%m-%d') startTime
+FROM stu103 stu,k103 k
+WHERE 
+stu.stu103_01 =#{stuid,jdbcType=VARCHAR}
+AND stu.type = k.type
+AND k.`k103_06`='word'
+GROUP BY k.type
+ORDER BY stu.`stu103_05` DESC
+</select>
+<!-- 作业详情    单词 -->
+<select id="findByWordDetail" resultType="java.util.Map">
+SELECT DISTINCT
+k.id word_id,
+k.`k103_01` standard_example,
+k.`k103_02` standard_explain,
+k.`k103_05` standard_video,
+stu.`stu103_03` learn_video,
+stu.`stu103_04` learn_score,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = stu.`type`) save
+FROM
+stu103 stu,k103 k
+WHERE stu.`stu103_02`=k.`id`
+AND stu.`stu103_01`=#{stuid,jdbcType=VARCHAR}
+AND k.`k103_06` = 'word'
+AND stu.`type`=#{hwid,jdbcType=VARCHAR}
+ORDER BY k.`ids`
+</select>
+<!-- 作业情况    短语 -->
+<select id="findByPhraseType" resultType="java.util.Map">
+SELECT DISTINCT
+(SELECT d.d111_01 FROM d111 d,texttype t WHERE d.d111_03=t.`t05` AND d.d111_05='31' AND t.`type` = stu.type) content_title,
+stu.`type` hwid,
+SUM(stu.`stu107_04`) scoreAll,
+DATE_FORMAT(stu.`stu107_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu107_05`, '%Y-%m-%d') startTime
+FROM stu107 stu,k103 k
+WHERE 
+stu.stu107_01 =#{stuid,jdbcType=VARCHAR}
+AND stu.type = k.type
+AND k.`k103_06`='phrase'
+GROUP BY k.type
+ORDER BY stu.`stu107_05` DESC
+</select>
+<!-- 作业详情   短语 -->
+<select id="findByPhraseDetail" resultType="java.util.Map">
+SELECT  DISTINCT
+k.id phrase_id,
+k.`k103_03` standard_example,
+k.`k103_04` standard_explain,
+k.`k103_05` standard_video,
+stu.`stu107_03` learn_video,
+stu.`stu107_04` learn_score,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = stu.`type`) save
+FROM
+stu107 stu,k103 k
+WHERE stu.`stu107_02`=k.`id`
+AND stu.`stu107_01`=#{stuid,jdbcType=VARCHAR}
+AND k.`k103_06` = 'phrase'
+AND stu.`type`=#{hwid,jdbcType=VARCHAR}
+ORDER BY k.`ids`
+</select>
+<!-- 作业情况     对话 -->
+<select id="findByTalkType" resultType="java.util.Map">
+SELECT DISTINCT
+k1.`k107_02` content_title,
+SUM(stu.`stu105_03`) scoreAll,
+DATE_FORMAT(stu.`stu105_06`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu105_06`, '%Y-%m-%d') startTime,
+stu105_01 hwid
+FROM stu105 stu,k107 k1
+WHERE stu.`stu105_01`= k1.`id`
+AND stu.`stu105_05`=#{stuid,jdbcType=VARCHAR}
+GROUP BY stu.`stu105_01`
+ORDER BY stu.`stu105_06` DESC
+</select>
+<!-- 作业详情   对话 -->
+<select id="findByTalkDetail" resultType="java.util.Map">
+SELECT 
+DISTINCT
+stu.`stu105_02` juese_id,
+k1.`id` talk_id,
+k2.`k108_04` standard_example,
+k2.`k108_03` standard_explain,
+k2.`k108_05` standard_video,
+stu.`stu105_04` learn_video,
+stu.`stu105_03` learn_score,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = k1.`type`) save
+FROM stu105 stu,k107 k1,k108 k2
+WHERE stu.`stu105_01`= k1.`id`
+AND k1.`id` = k2.`k108_01`
+AND k2.`id` = stu.`stu105_02`
+AND stu.`stu105_05`=#{stuid,jdbcType=VARCHAR}
+AND k1.`id`=#{hwid,jdbcType=VARCHAR}
+ORDER BY k2.`ids` ASC
+</select>
+<!-- 作业情况    课文 -->
+<select id="findByTextType" resultType="java.util.Map">
+SELECT DISTINCT
+k.`k102_01` content_title,
+SUM(stu.`stu106_04`) scoreAll,
+DATE_FORMAT(stu.`stu106_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu106_05`, '%Y-%m-%d') startTime,
+k.id hwid
+FROM stu106 stu, k102 k
+WHERE k.id=stu.`stu106_02`
+AND stu.`stu106_01`=#{stuid,jdbcType=VARCHAR}
+ GROUP BY stu.`stu106_02`
+ORDER BY stu.`stu106_05`DESC
+</select>
+<!-- 作业详情    课文 -->
+<select id="findByTextDetail" resultType="java.util.Map">
+SELECT DISTINCT
+k.id text_id,
+k.`k102_03` standard_example,
+k.`k102_02` standard_explain,
+k.`k102_04` standard_video,
+stu.`stu106_04` learn_score,
+stu.`stu106_03` learn_video,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = k.`type`) save
+FROM stu106 stu,k102 k
+WHERE k.`id`=stu.`stu106_02`
+AND k.`id`=#{hwid,jdbcType=VARCHAR}
+AND stu.`stu106_01`=#{stuid,jdbcType=VARCHAR}
+</select>
+<!-- 作业情况   句子 -->
+<select id="findBySentenceType" resultType="java.util.Map">
+SELECT DISTINCT
+k1.`k105_01` content_title,
+SUM(stu.`stu108_04`) scoreAll,
+DATE_FORMAT(stu.`stu108_06`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu.`stu108_06`, '%Y-%m-%d') startTime,
+stu.`stu108_05` hwid
+FROM stu108 stu,k105 k1
+WHERE stu.`stu108_05`= k1.`id`
+AND stu.`stu108_01`=#{stuid,jdbcType=VARCHAR}
+GROUP BY stu.`stu108_05`
+ORDER BY stu.`stu108_06` DESC
+</select>
+<!-- 作业详情    句子 -->
+<select id="findBySentenceDetail" resultType="java.util.Map">
+SELECT 
+DISTINCT
+stu.`stu108_02` sentence_sid,
+k1.`id` sentence_id,
+k2.`k104_03` standard_example,
+k2.`k104_02` standard_explain,
+k2.`k104_04` standard_video,
+stu.`stu108_03` learn_video,
+stu.`stu108_04` learn_score,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = k1.`type`) save
+FROM stu108 stu,k105 k1,k104 k2
+WHERE stu.`stu108_05`= k1.`id`
+AND k1.`id` = k2.`k104_01`
+AND k2.`id` = stu.`stu108_02`
+AND stu.`stu108_01`=#{stuid,jdbcType=VARCHAR}
+AND k1.`id`=#{hwid,jdbcType=VARCHAR}
+ORDER BY k2.`ids` ASC
+</select>
+<!-- 作业情况    阅读 -->
+<select id="findByReadType" resultType="java.util.Map">
+SELECT DISTINCT
+k1.`k106_01` content_title,
+stu1.stu110_03 scoreAll,
+DATE_FORMAT(stu1.`stu110_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu1.`stu110_05`, '%Y-%m-%d') startTime,
+k1.`k106_03` standard_content,
+k1.`id` hwid,
+k1.`k106_03` read_content
+FROM stu110 stu1,k106 k1
+WHERE stu1.`stu110_02` = k1.`id`
+AND stu1.`stu110_01`=#{stuid,jdbcType=VARCHAR}
+GROUP BY stu1.`stu110_02`
+order by stu1.`stu110_05`
+</select>
+<!-- 作业详情   阅读 -->
+<select id="findByReadDetail" resultType="java.util.Map">
+SELECT DISTINCT
+k2.id read_qid,
+k2.`k116_03` standard_example,
+k2.`k116_04` standard_explain,
+k2.`k116_02` standard_video,
+stu2.`stu111_03` learn_video,
+stu2.`stu111_04` learn_score,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = k1.`type`) save
+FROM stu110 stu1,stu111 stu2,k106 k1,k116 k2
+WHERE stu1.`stu110_02` = k1.`id`
+AND stu1.`stu110_02` = stu2.`stu111_05`
+AND stu2.`stu111_02`=k2.`id`
+AND k2.`k116_01`= k1.`id`
+AND stu1.`stu110_02`=#{hwid,jdbcType=VARCHAR}
+AND stu1.`stu110_01`=#{stuid,jdbcType=VARCHAR}
+ORDER BY k2.`ids`
+</select>
+<!-- 根据read_qid查询选项 -->
+<select id="findByReadOption" resultType="java.util.Map">
+SELECT DISTINCT
+k.`k126_02` read_xuanxiang,
+k.`k126_03` read_tupian,
+k.`k126_04` read_xuanxiangContent
+FROM k126 k
+WHERE k.`k126_01`=#{read_qid,jdbcType=VARCHAR}
+ORDER BY ids
+</select>
+<!-- 作业情况    听力 -->
+<select id="findByListenType" resultType="java.util.Map">
+SELECT DISTINCT
+k1.`k101_03` content_title,
+stu1.`stu112_03` scoreAll,
+DATE_FORMAT(stu1.`stu112_05`, '%Y-%m-%d') finishTime,
+DATE_FORMAT(stu1.`stu112_05`, '%Y-%m-%d') startTime,
+k1.`id` hwid,
+k1.`k101_02` listen_type,
+k1.`k101_04` standard_video1,
+k1.`k101_07` standard_content,
+(SELECT CONCAT_WS('_', t01, t02, t03, t04, t05 ) FROM texttype WHERE texttype.`type` = k1.`type`) save
+FROM stu112 stu1,k101 k1
+WHERE stu1.`stu112_02` = k1.`id`
+AND stu1.`stu112_01`=#{stuid,jdbcType=VARCHAR}
+ORDER BY stu1.`stu112_05`
+</select>
+<!-- 作业详情   听力 -->
+<select id="findByListenDetail" resultType="java.util.Map">
+SELECT DISTINCT
+k2.id listen_qid,
+k2.`k110_05` standard_example,
+k2.`k110_06` standard_explain,
+k2.`k110_07` standard_video,
+stu2.`stu113_03` learn_video,
+stu2.`stu113_04` learn_score
+FROM stu112 stu1,stu113 stu2,k101 k1,k110 k2
+WHERE stu1.`stu112_02` = k1.`id`
+AND stu1.`stu112_02` = stu2.`stu113_05`
+AND stu2.`stu113_02`=k2.`id`
+AND k2.`k110_02`= k1.`id`
+AND stu1.`stu112_02`=#{hwid,jdbcType=VARCHAR}
+AND stu1.`stu112_01`=#{stuid,jdbcType=VARCHAR}
+ORDER BY order_00
+</select>
+<!-- 根据listen_qid查询选项 -->
+<select id="findByListenOption" resultType="java.util.Map">
+SELECT 
+k.`k111_01` read_xuanxiang,
+k.`k111_04` read_tupian,
+k.`k111_02` read_xuanxiangContent
+FROM k111 k
+WHERE k.`k111_03`=#{listen_qid,jdbcType=VARCHAR}
+ORDER BY k.id
+</select>
+
+<!-- 临时表的添加 -->
+<insert id="saveLinshiTable" parameterType="java.util.Map">
+insert into lishitable
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="content_title != null and content_title !=''" >
+content_title,
+</if>
+<if test="finishState != null and finishState !=''" >
+finishState,
+</if>
+<if test="finishTime != null and finishTime !=''" >
+finishTime,
+</if>
+<if test="finishSpeed != null and finishSpeed !=''" >
+finishSpeed,
+</if>
+<if test="hwid != null and hwid !=''" >
+hwid,
+</if>
+<if test="title != null and title !=''" >
+title,
+</if>
+<if test="stuid != null and stuid !=''" >
+stuid,
+</if>
+<if test="Relative_path != null and Relative_path !=''" >
+Relative_path,
+</if>
+<if test="scoreAll != null and scoreAll !=''" >
+scoreAll,
+</if>
+<if test="finishCount != null and finishCount !=''" >
+finishCount,
+</if>
+<if test="allCount != null and allCount !=''" >
+allCount,
+</if>
+<if test="listen_type != null and listen_type !=''" >
+listen_type,
+</if>
+<if test="hw_type != null and hw_type !=''" >
+hw_type,
+</if>
+<if test="standard_video1 != null and standard_video1 !=''" >
+standard_video1,
+</if>
+<if test="startTime != null and startTime !=''" >
+startTime,
+</if>
+<if test="standard_content != null and standard_content !=''" >
+standard_content,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="content_title != null and content_title !=''" >
+#{content_title,jdbcType=VARCHAR},
+</if>
+<if test="finishState != null and finishState !=''" >
+#{finishState,jdbcType=VARCHAR},
+</if>
+<if test="finishTime != null and finishTime !=''" >
+#{finishTime,jdbcType=VARCHAR},
+</if>
+<if test="finishSpeed != null and finishSpeed !=''" >
+#{finishSpeed,jdbcType=VARCHAR},
+</if>
+<if test="hwid != null and hwid !=''" >
+#{hwid,jdbcType=VARCHAR},
+</if>
+<if test="title != null and title !=''" >
+#{title,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="Relative_path != null and Relative_path !=''" >
+#{Relative_path,jdbcType=VARCHAR},
+</if>
+<if test="scoreAll != null and scoreAll !=''" >
+#{scoreAll,jdbcType=VARCHAR},
+</if>
+<if test="finishCount != null and finishCount !=''" >
+#{finishCount,jdbcType=VARCHAR},
+</if>
+<if test="allCount != null and allCount !=''" >
+#{allCount,jdbcType=VARCHAR},
+</if>
+<if test="listen_type != null and listen_type !=''" >
+#{listen_type,jdbcType=VARCHAR},
+</if>
+<if test="hw_type != null and hw_type !=''" >
+#{hw_type,jdbcType=VARCHAR},
+</if>
+<if test="standard_video1 != null and standard_video1 !=''" >
+#{standard_video1,jdbcType=VARCHAR},
+</if>
+<if test="startTime != null and startTime !=''" >
+#{startTime,jdbcType=VARCHAR},
+</if>
+<if test="standard_content != null and standard_content !=''" >
+#{standard_content,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<delete id="delLinShiTable" parameterType="java.util.Map">
+DELETE FROM lishitable WHERE stuid=#{stuid}
+</delete>
+<select id="findLinAll" resultType="java.util.Map">
+select *
+from lishitable
+where 1=1
+and stuid=#{stuid}
+<if test="finishTime !='' and finishTime != null">
+and finishTime like '%${finishTime}%'
+</if>
+order by finishTime DESC
+</select>
+</mapper>

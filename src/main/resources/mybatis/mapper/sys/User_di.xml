@@ -1,0 +1,1987 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xljy.sys.dao.User_di">
+	<!-- 约定: _d是代码 , _m是名称 -->
+	<!-- 目的：为dao接口方法提供sql语句配置 -->
+
+
+	<select
+		id="findall"
+		resultType="java.util.Map">
+		SELECT
+		a.Id id,
+		a.d101_01 user_m,
+		<!-- d101_02 usertype_code, (SELECT d111_01 FROM d111 WHERE d101_02=d111_03 AND d111_05=20) usertype, -->
+		<if test=" usertype_code != 5 ">
+			a.d101_12 user_dianhua,
+		</if>
+		<if test=" usertype_code == 5 ">
+			<!-- GROUP_CONCAT((SELECT d107_03 FROM d107 WHERE d107.id =b.d112_01 ),'') user_banji_d, -->
+			a.d101_14 user_vip_d,
+			date_format(a.d101_15, '%Y-%m-%d') user_vip_s,
+			date_format(a.d101_16,
+			'%Y-%m-%d') user_vip_e,
+		</if>
+
+		a.d101_03 user_zhanghao,
+		a.d101_04 user_diqu_d,
+		left(a.d101_04, 2) user_sheng_d,
+		(SELECT d106_02 FROM d106 WHERE left(a.d101_04, 2) =d106_01 and d106_04='1' ) user_sheng_m,
+		left(d101_04, 4) user_shi_d,
+		(SELECT d106_02 FROM d106 WHERE left(a.d101_04, 4) =d106_01 and d106_04='2' ) user_shi_m,
+		left(a.d101_04, 6) user_qu_d,
+		(SELECT d106_02 FROM d106 WHERE left(a.d101_04, 6) =d106_01 and d106_04='3' ) user_qu_m,
+		a.d101_05 user_school_d,
+		(SELECT d108_02 FROM d108 WHERE a.d101_05=d108_01) user_school_m,
+		a.d101_06 user_sex_d,
+		(SELECT d111_01
+		FROM d111 WHERE
+		a.d101_06 =d111_03 AND
+		d111_05=16)
+		user_sex_m
+
+		FROM
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015 a
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014 a
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013 a
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012 a
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011 a
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010 a
+			</when>
+
+		</choose>
+
+		<if test=" usertype_code == 5 and banji_d != null and banji_d !='' ">
+			left join d112 b on b.d112_02= a.Id
+		</if>
+
+		WHERE 1=1
+
+		<if test=" usertype_code == 5 and banji_d != null and banji_d !='' ">
+			and b.d112_01= #{banji_d}
+		</if>
+		<if test="id != null and id !=''">
+			and a.Id= #{id}
+		</if>
+
+		<if test="user_m != null and user_m !=''">
+			and a.d101_01 like CONCAT(#{user_m},'%')
+		</if>
+		<!-- <if test="usertype_code != null and usertype_code !=''"> and d101_02= #{usertype_code} </if> -->
+		<if test="user_zhanghao != null and user_zhanghao !=''">
+			and a.d101_03 = #{user_zhanghao}
+		</if>
+		
+		<if test="user_mima != null and user_mima !=''">
+			and a.d101_11 = #{user_mima}
+		</if>
+
+		<if test="user_school_d != null and user_school_d !=''">
+			and a.d101_05= #{user_school_d}
+		</if>
+
+		<if test="user_sex_d != null and user_sex_d !=''">
+			and a.d101_06= #{user_sex_d}
+		</if>
+
+		<if test="user_dianhua != null and user_dianhua !=''">
+			and a.d101_12 = #{user_dianhua}
+		</if>
+
+		<if test="sheng != null and sheng !=''">
+			and a.d101_04 like CONCAT(#{sheng},'%')
+		</if>
+		<if test="shi != null and shi !=''">
+			and a.d101_04 like CONCAT(#{shi},'%')
+		</if>
+		<if test="qu != null and qu !='' ">
+			and a.d101_04 like CONCAT(#{qu},'%')
+		</if>
+
+
+	</select>
+
+	<select
+		id="findUserById"
+		resultType="java.util.Map">
+		select
+		Id,
+		d101_01 user_ming,
+		(SELECT d111_01 FROM d111
+		WHERE
+		d.d101_02=d111_03
+		AND
+		d111_05=20)
+		usertype,
+		d101_03 usernumber,
+		(SELECT
+		d106_02 FROM d106 WHERE
+		d.d101_04=d106_01)
+		userarea,
+		(SELECT d108_02
+		FROM
+		d108 WHERE
+		d.d101_05=d108_01) school,
+		(SELECT
+		d111_01 FROM d111 WHERE
+		d.`d101_06`=d111_03 AND
+		d111_05=16) sex,
+		(SELECT d111_01 FROM d111
+		WHERE
+		d.d101_07=d111_03 AND
+		d111_05=10)
+		grade,
+		(SELECT
+		d111_01 FROM d111
+		WHERE d.d101_08=d111_03
+		AND
+		d111_05=13) class,
+		d.`d101_09`
+		user_jiazhangid,
+		d.`d101_10` user_jiatingid,
+
+		d.`d101_12` user_dianhua
+		from d101 d
+		where
+		id= #{id}
+	</select>
+
+
+	<!-- 添加用户 -->
+	<insert
+		id="addUser"
+		parameterType="java.util.Map">
+		insert into d101
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+			<if test="id != null and id !=''">
+				Id,
+			</if>
+			<if test="user_ming != null and user_ming !=''">
+				d101_01,
+			</if>
+			<!-- <if test="usertype_code != null and usertype_code !=''" > d101_02, </if> -->
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				d101_03,
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_schoolcode != null and user_schoolcode !=''">
+				d101_05,
+			</if>
+			<if test="user_sex != null and user_sex !=''">
+				d101_06,
+			</if>
+			<if test="user_nianjima != null and user_nianjima !=''">
+				d101_07,
+			</if>
+			<if test="user_banjima != null and user_banjima !=''">
+				d101_08,
+			</if>
+
+			<!-- <if test="user_jiazhangid != null and user_jiazhangid !=''" > d101_09, </if> <if test="user_jiatingid != null and user_jiatingid !=''" > d101_10, </if> -->
+			<!-- 根据账号定密码 -->
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				D101_11,
+			</if>
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+			<if test="id != null and id !=''">
+				#{id,jdbcType=INTEGER},
+			</if>
+			<if test="user_ming != null and user_ming !=''">
+				#{user_ming,jdbcType=VARCHAR},
+			</if>
+			<!-- <if test="usertype_code != null and usertype_code !=''" > #{usertype_code,jdbcType=VARCHAR}, </if> -->
+
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				#{user_zhanghao,jdbcType=VARCHAR},
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_schoolcode != null and user_schoolcode !=''">
+				#{user_schoolcode,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex != null and user_sex !=''">
+				#{user_sex,jdbcType=VARCHAR},
+			</if>
+			<if test="user_nianjima != null and user_nianjima !=''">
+				#{user_nianjima,jdbcType=VARCHAR},
+			</if>
+			<if test="user_banjima != null and user_banjima !=''">
+				#{user_banjima ,jdbcType=VARCHAR},
+			</if>
+
+			<!-- <if test="user_jiazhangid != null and user_jiazhangid !=''" > #{user_jiazhangid,jdbcType=VARCHAR}, </if> <if test="user_jiatingid != null and user_jiatingid !=''" > #{user_jiatingid,jdbcType=VARCHAR}, </if> -->
+
+			<!-- 默认密码 -->
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+
+	<!-- 修改用户 -->
+	<update
+		id="updateUser"
+		parameterType="java.util.Map">
+		update
+
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		<set>
+			<if test="user_m != null and user_m !=''">
+				d101_01 = #{user_m,jdbcType=VARCHAR},
+			</if>
+
+			<!-- <if test="usertype_code != null and usertype_code !=''" > d101_02 = #{usertype_code,jdbcType=VARCHAR}, </if> -->
+
+			<!-- 修改账号不能改 -->
+			<!-- <if test="usernumber != null and usernumber !=''" > d101_03 = #{usernumber,jdbcType=VARCHAR}, </if> -->
+
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04 = #{user_diquma,jdbcType=VARCHAR},
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05 = #{user_school_d,jdbcType=VARCHAR},
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06 = #{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+
+			<if test="user_mima != null and user_mima !=''">
+				D101_11 = #{user_mima,jdbcType=VARCHAR},
+			</if>
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12 = #{user_dianhua,jdbcType=VARCHAR},
+			</if>
+			<if test="user_xueduan_d != null and user_xueduan_d !=''">
+				d101_18 = #{user_xueduan_d},
+			</if>
+		</set>
+
+		where Id = #{id,jdbcType=INTEGER}
+	</update>
+
+	<!-- 删除用户 -->
+	<delete
+		id="delUserById"
+		parameterType="java.util.Map">
+		delete from
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where Id = #{id,jdbcType=INTEGER}
+	</delete>
+
+	<update
+		id="updatePW"
+		parameterType="java.util.Map">
+		update
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		set
+		d101_11 = #{user_password}
+		where id = #{id}
+	</update>
+
+
+	<insert id="addUser_juese">
+		insert into d104 (d104_01 ,d104_02) values
+		(#{user_id} , #{juese_d})
+
+	</insert>
+
+	<!-- 添加用户_学生 -->
+	<insert
+		id="addUser_xuesheng"
+		parameterType="java.util.Map">
+		insert into d1015
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				d101_03,
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+
+			<if test="user_mima != null and user_mima !=''">
+				D101_11,
+			</if>
+			<if test="user_vip_d != null and user_vip_d !=''">
+				D101_14,
+			</if>
+			<if test="user_vip_s != null and user_vip_s !=''">
+				D101_15,
+			</if>
+			<if test="user_vip_e != null and user_vip_e !=''">
+				D101_16,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				#{user_m,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				#{user_zhanghao,jdbcType=VARCHAR},
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_vip_d != null and user_vip_d !=''">
+				#{user_vip_d},
+			</if>
+			<if test="user_vip_s != null and user_vip_s !=''">
+				str_to_date(#{user_vip_s}, '%Y-%m-%d'),
+			</if>
+			<if test="user_vip_e != null and user_vip_e !=''">
+				str_to_date(#{user_vip_e}, '%Y-%m-%d'),
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 添加用户_家长 -->
+	<insert
+		id="addUser_jiazhang"
+		parameterType="java.util.Map">
+		insert into d1014
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<!-- 添加用户_教研员 -->
+	<insert
+		id="addUser_jiaoyanyuan"
+		parameterType="java.util.Map">
+		insert into d1013
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					D101_11,
+				</when>
+				<otherwise>
+					D101_11,
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				#{user_m,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<!-- 添加用户_老师 -->
+	<insert
+		id="addUser_laoshi"
+		parameterType="java.util.Map">
+		insert into d1012
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					D101_11,
+				</when>
+				<otherwise>
+					D101_11,
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				#{user_m,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<!-- 添加用户_校长 -->
+	<insert
+		id="addUser_xiaozhang"
+		parameterType="java.util.Map">
+		insert into d1011
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					D101_11,
+				</when>
+				<otherwise>
+					D101_11,
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				#{user_m,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+
+	<!-- 添加用户_管理员 -->
+	<insert
+		id="addUser_guanliyuan"
+		parameterType="java.util.Map">
+		insert into d1010
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				d101_01,
+			</if>
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				d101_03,
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				d101_04,
+			</if>
+			<if test="user_school_d != null and user_school_d !=''">
+				d101_05,
+			</if>
+			<if test="user_sex_d != null and user_sex_d !=''">
+				d101_06,
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					D101_11,
+				</when>
+				<otherwise>
+					D101_11,
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				d101_12,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="user_m != null and user_m !=''">
+				#{user_m,jdbcType=VARCHAR},
+			</if>
+			<if test="user_zhanghao != null and user_zhanghao !=''">
+				#{user_zhanghao,jdbcType=VARCHAR},
+			</if>
+			<if test="user_diquma != null and user_diquma !=''">
+				#{user_diquma,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_school_d != null and user_school_d !=''">
+				#{user_school_d,jdbcType=VARCHAR},
+			</if>
+
+			<if test="user_sex_d != null and user_sex_d !=''">
+				#{user_sex_d,jdbcType=VARCHAR},
+			</if>
+
+			<choose>
+				<when test="user_mima != null and user_mima !=''">
+					#{user_mima ,jdbcType=VARCHAR},
+				</when>
+				<otherwise>
+					'88899921',
+				</otherwise>
+			</choose>
+
+			<if test="user_dianhua != null and user_dianhua !=''">
+				#{user_dianhua,jdbcType=VARCHAR},
+			</if>
+
+		</trim>
+	</insert>
+
+	<select
+		id="findall_yz"
+		resultType="java.util.Map">
+		select * from
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1
+		<if test="id != null and id !=''">
+			and Id= #{id}
+		</if>
+
+		<if test="user_m != null and user_m !=''">
+			and d101_01 like CONCAT(#{user_m},'%')
+		</if>
+
+		<if test="user_zhanghao != null and user_zhanghao !=''">
+			and d101_03 = #{user_zhanghao}
+		</if>
+
+		<if test="user_school_d != null and user_school_d !=''">
+			and d101_05= #{user_school_d}
+		</if>
+
+		<if test="user_sex_d != null and user_sex_d !=''">
+			and d101_06= #{user_sex_d}
+		</if>
+
+		<if test="user_dianhua != null and user_dianhua !=''">
+			and d101_12 = #{user_dianhua}
+		</if>
+
+		<if test="sheng != null and sheng !=''">
+			and d101_04 like CONCAT(#{sheng},'%')
+		</if>
+		<if test="shi != null and shi !=''">
+			and d101_04 like CONCAT(#{shi},'%')
+		</if>
+		<if test="qu != null and qu !='' ">
+			and d101_04 like CONCAT(#{qu},'%')
+		</if>
+
+	</select>
+
+	<select
+		id="findall_zhanghao_yz"
+		resultType="java.util.Map">
+		select * from
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1
+		and d101_03 = #{user_zhanghao}
+	</select>
+
+	<select
+		id="findall_yz_dianhua"
+		resultType="java.util.Map">
+		select * from
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		where 1=1
+
+		and d101_12 = #{user_dianhua}
+
+	</select>
+
+	<!-- 添加班级 -->
+	<insert
+		id="addbanji"
+		parameterType="java.util.Map">
+		insert into d107
+		<trim
+			prefix="("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="banji_m != null and banji_m !=''">
+				d107_01,
+			</if>
+			<if test="laoshi_id != null and laoshi_id !=''">
+				d107_02,
+			</if>
+			<if test="banji_d != null and banji_d !=''">
+				d107_03,
+			</if>
+			<if test="nianji_d != null and nianji_d !=''">
+				d107_04,
+			</if>
+			<if test="sf_zdy != null and sf_zdy !=''">
+				d107_05,
+			</if>
+
+		</trim>
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+
+			<if test="banji_m != null and banji_m !=''">
+				#{banji_m,jdbcType=VARCHAR},
+			</if>
+			<if test="laoshi_id != null and laoshi_id !=''">
+				#{laoshi_id,jdbcType=VARCHAR},
+			</if>
+			<if test="banji_d != null and banji_d !=''">
+				#{banji_d,jdbcType=VARCHAR},
+			</if>
+			<if test="nianji_d != null and nianji_d !=''">
+				#{nianji_d,jdbcType=VARCHAR},
+			</if>
+			<if test="sf_zdy != null and sf_zdy !=''">
+				#{sf_zdy},
+			</if>
+
+		</trim>
+	</insert>
+
+	<!-- 删除老师班级 老师id -->
+	<delete
+		id="del_laoshi_banji"
+		parameterType="java.util.Map">
+		delete from
+		d113
+		where d113_01 =
+		#{id,jdbcType=INTEGER}
+	</delete>
+	<!-- 删除家长与学生的关联信息 家长id -->
+	<delete
+		id="del_jiazhang_xuesheng"
+		parameterType="java.util.Map">
+		delete from
+		d109
+		where d109_01 =
+		#{id,jdbcType=INTEGER}
+	</delete>
+	<!-- 删除与班级的关联信息 学生id -->
+	<delete
+		id="del_xuesheng_banji"
+		parameterType="java.util.Map">
+		delete from
+		d112
+		where d112_02 =
+		#{id,jdbcType=INTEGER}
+	</delete>
+
+	<!-- 老师关联班级 -->
+	<insert id="laoshi9banji">
+		insert into d113 (d113_01,d113_02)
+		values
+		(#{laoshi_id},#{banji_d})
+	</insert>
+
+	<select
+		id="findall_banji"
+		resultType="java.util.Map">
+		SELECT
+		(select count(1) from d112 where a.d107_03=d112_01)banji_rs,
+		a.id banji_id,
+		a.d107_01 banji_m,
+		a.d107_03 banji_d,
+		a.d107_04 nianji_d,
+		(SELECT d111_01 FROM d111 WHERE a.d107_04 =d111_03 AND d111_02='年级') nianji_m,
+		a.d107_05 sf_zdy,
+		a.d107_06 sf_njr
+		FROM
+		d107 a
+		<if test="laoshi_id != null and laoshi_id !=''">
+			left join d113 b on a.d107_03=b.d113_02
+		</if>
+		<if test="xuesheng_id != null and xuesheng_id !=''">
+			left join d112 c on a.d107_03=c.d112_01
+		</if>
+		where 1=1
+		<if test="laoshi_id != null and laoshi_id !=''">
+			and b.d113_01= #{laoshi_id}
+		</if>
+		<if test="xuesheng_id != null and xuesheng_id !=''">
+			and c.d112_02= #{xuesheng_id}
+		</if>
+		<if test="nianji_d != null and nianji_d !=''">
+			and a.d107_04= #{nianji_d}
+		</if>
+
+		<if test="banji_m != null and banji_m !=''">
+			and a.d107_01 like CONCAT('%',#{banji_m},'%')
+		</if>
+
+	</select>
+
+	<!-- 修改班级的 -->
+	<update
+		id="update_banji"
+		parameterType="java.util.Map">
+		update
+		d107
+		<set>
+			<if test="banji_m != null and banji_m !=''">
+				d107_01 = #{banji_m},
+			</if>
+			<if test="nianji_d != null and nianji_d !=''">
+				d107_04 = #{nianji_d},
+			</if>
+			<if test="sf_njr != null and sf_njr !=''">
+				d107_06 = #{sf_njr},
+			</if>
+		</set>
+		where d107_03 = #{banji_d}
+	</update>
+
+	<delete
+		id="delxuesheng4banji"
+		parameterType="java.util.Map">
+		delete from
+		d112
+		where d112_01=#{banji_d} and d112_02 in
+		<foreach
+			collection="list_stu_id"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item.stu_id}
+		</foreach>
+	</delete>
+
+	<select
+		id="findall_stu"
+		resultType="java.util.Map">
+		SELECT
+		ROUND(((SELECT COUNT(1) zycs_wc FROM hw101 WHERE hw101_02 = a.Id) / (SELECT COUNT(1) FROM t102 WHERE t102_02 =#{banji_d} ))* 100,2) stu_zy_wcd,
+		ROUND((SELECT sum(hw101_04) zyfs_wc FROM hw101 WHERE hw101_02 = a.Id) / (SELECT COUNT(1)*100 FROM t102 WHERE t102_02 =#{banji_d}) * 100,2) stu_zy_dfl,
+		a.Id stu_id,
+		a.d101_01 stu_m,
+		a.d101_14 stu_vip_d,
+		DATE_FORMAT(a.d101_15, '%Y-%m-%d') stu_vip_s,
+		DATE_FORMAT(a.d101_16, '%Y-%m-%d') stu_vip_e,
+		TIMESTAMPDIFF(DAY,a.d101_15,a.d101_16) z_stu_vip_day,
+		TIMESTAMPDIFF(DAY,if(now()-a.d101_15 &lt; 0,a.d101_15,now()),a.d101_16) s_stu_vip_day
+		FROM
+		d1015 a
+		left join d112 b on a.id=b.d112_02
+		where 1=1
+		and b.d112_01=#{banji_d}
+		<if test="stu_vip_d != null and stu_vip_d !=''">
+			and d101_14 = #{stu_vip_d}
+		</if>
+		order by stu_zy_dfl desc
+	</select>
+
+	<select
+		id="laoshi_huizong"
+		resultType="java.util.Map">
+		SELECT
+		(select count(1)
+		from d113 where d113_01=
+		#{laoshi_id}
+		) s_banji,
+		(
+		select count(1)
+		from
+		d112 where d112_01 in(select d113_02
+		from d113 where
+		d113_01=
+		#{laoshi_id}) ) s_stu,
+		(select
+		count(1)
+		from t101
+		where
+		t101_09=
+		#{laoshi_id} ) s_zuoye
+
+	</select>
+
+
+	<select
+		id="list_danyuan"
+		resultType="java.util.Map">
+		SELECT
+		<!-- 单词短语要返回是否选中 -->
+		<choose>
+			<!-- 音标 -->
+			<when test="neirong_type_d == 0">
+
+			</when>
+			<!-- 课文 -->
+			<when test="neirong_type_d == 1">
+
+			</when>
+			<!-- 单词 -->
+			<when test="neirong_type_d == 2">
+				(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.type and t104_04 in(select id from t101 where t101_09=#{laoshi_id}  AND t101_13='1') ) >0 then '1' else '0' end) sf_old,
+				(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.type ) >0 then '1' else '0' end) sf_xz,
+			</when>
+			<!-- 短语 -->
+			<when test="neirong_type_d == 8">
+				(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.type and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1')  ) >0 then '1' else '0' end) sf_old,
+				(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.type ) >0 then '1' else '0' end) sf_xz,
+			</when>
+			<!-- 句子 -->
+			<when test="neirong_type_d == 3">
+
+			</when>
+			<!-- 对话 -->
+			<when test="neirong_type_d == 4">
+
+			</when>
+			<!-- 听力 -->
+			<when test="neirong_type_d == 5">
+
+			</when>
+			<!-- 阅读 -->
+			<when test="neirong_type_d == 6">
+
+			</when>
+			<!-- 作文 -->
+			<when test="neirong_type_d == 7">
+
+			</when>
+
+			<otherwise>
+
+			</otherwise>
+		</choose>
+
+		a.type danyuan_id,
+		( SELECT d111_01 FROM d111 WHERE d111_02 ='单元' AND d111_03 =a.t05) danyuan_m,
+		a.t06 danyuan_tupian ,
+		CONCAT( CONCAT_WS('_',a.t01,a.t02,a.t03,a.t04,a.t05),
+		<choose>
+			<!-- 音标 外部其他方法处理了 -->
+			<when test="neirong_type_d == 0">
+
+			</when>
+			<!-- 课文 -->
+			<when test="neirong_type_d == 1">
+				'/kewen/'
+			</when>
+			<!-- 单词 -->
+			<when test="neirong_type_d == 2">
+				CONCAT('/danci/',a.type,'/')
+			</when>
+			<!-- 句子 -->
+			<when test="neirong_type_d == 3">
+				'/jvzi/'
+			</when>
+			<!-- 对话 -->
+			<when test="neirong_type_d == 4">
+				'/duihua/'
+			</when>
+			<!-- 听力 -->
+			<when test="neirong_type_d == 5">
+				'/tingli/'
+			</when>
+			<!-- 阅读 -->
+			<when test="neirong_type_d == 6">
+				'/yuedu/'
+			</when>
+			<!-- 作文 -->
+			<when test="neirong_type_d == 7">
+				'/zuowen/'
+			</when>
+			<!-- 短语 -->
+			<when test="neirong_type_d == 8">
+				CONCAT('/duanyu/',a.type,'/')
+			</when>
+			<otherwise>
+
+			</otherwise>
+		</choose>
+		) save
+
+		FROM
+		texttype a
+
+		where
+		1=1
+		and CONCAT_WS('_',a.t01,a.t03,a.t04) =#{jiaocai_d}
+
+		<choose>
+			<!-- 音标 -->
+			<when test="neirong_type_d == 0">
+
+			</when>
+			<!-- 课文 -->
+			<when test="neirong_type_d == 1">
+				AND EXISTS ( SELECT 1 FROM k102 b WHERE a.type=b.type )
+			</when>
+			<!-- 单词 k103_06='word' -->
+			<when test="neirong_type_d == 2">
+				AND EXISTS ( SELECT 1 FROM k103 b WHERE a.type=b.type and b.k103_06='word')
+			</when>
+			<!-- 句子 -->
+			<when test="neirong_type_d == 3">
+				AND EXISTS ( SELECT 1 FROM k105 b WHERE a.type=b.type )
+			</when>
+			<!-- 对话 -->
+			<when test="neirong_type_d == 4">
+				AND EXISTS ( SELECT 1 FROM k107 b WHERE a.type=b.type )
+			</when>
+			<!-- 听力 -->
+			<when test="neirong_type_d == 5">
+				AND EXISTS ( SELECT 1 FROM k101 b WHERE a.type=b.type 
+				<if test="tingli_type_d != null and tingli_type_d !=''">
+					and b.k101_02=#{tingli_type_d}
+				</if>
+				 )
+			</when>
+			<!-- 阅读 -->
+			<when test="neirong_type_d == 6">
+				AND EXISTS ( SELECT 1 FROM k106 b WHERE a.type=b.type )
+			</when>
+			<!-- 作文 -->
+			<when test="neirong_type_d == 7">
+				AND EXISTS ( SELECT 1 FROM k109 b WHERE a.type=b.k109_06 )
+			</when>
+			<!-- 短语 k103_06='phrase' -->
+			<when test="neirong_type_d == 8">
+				AND EXISTS ( SELECT 1 FROM k103 b WHERE a.type=b.type and b.k103_06='phrase')
+			</when>
+			<otherwise>
+
+			</otherwise>
+		</choose>
+		order by a.t03*1,a.t04*1,a.t05*1
+
+	</select>
+
+
+	<select
+		id="list_ti_kewen"
+		resultType="java.util.Map">
+		SELECT
+		a.id kewen_id,
+		a.k102_01 kewen_m,
+		a.k102_02 kewen_neirong_z,
+		a.k102_03 kewen_neirong_y,
+		a.k102_04 kewen_yinpin,
+		a.k102_05 kewen_tupian,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1' ) ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k102 a
+		where 1=1
+		and a.type =#{danyuan_id}
+
+	</select>
+
+	<!-- 短语是单表的 -->
+	<select
+		id="list_ti_duanyu"
+		resultType="java.util.Map">
+		SELECT
+		a.id danci_id,
+		a.k103_01 danci_neirong,
+		a.k103_02 danci_ybfy,
+		a.k103_03 danci_dy,
+		a.k103_04 danci_dyfy,
+		a.k103_05 danci_yinpin
+		FROM
+		k103 a
+		where 1=1
+		and a.type =#{danyuan_id}
+		and a.k103_06 ='phrase'
+
+	</select>
+
+	<!-- 单词是单表的 -->
+	<select
+		id="list_ti_danci"
+		resultType="java.util.Map">
+		SELECT
+		a.id danci_id,
+		a.k103_01 danci_neirong,
+		a.k103_02 danci_ybfy,
+		a.k103_03 danci_dy,
+		a.k103_04 danci_dyfy,
+		a.k103_05 danci_yinpin
+		FROM
+		k103 a
+		where 1=1
+		and a.type =#{danyuan_id}
+		and a.k103_06 ='word'
+	</select>
+
+	<!-- 句子是多表的 -->
+	<select
+		id="list_ti_jvzi"
+		resultType="java.util.Map">
+		SELECT
+		id jvzi_id,
+		k105_01 jvzi_m,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1')  ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k105 a
+		where 1=1
+		and a.type =#{danyuan_id}
+
+	</select>
+
+	<!-- 对话是多表的 -->
+	<select
+		id="list_ti_duihua"
+		resultType="java.util.Map">
+		SELECT
+		id duihua_id,
+		k107_02 duihua_m,
+		k107_03 duihua_tupian,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1') ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k107 a
+		where 1=1
+		and a.type =#{danyuan_id}
+
+	</select>
+
+	<!-- 听力是多表的 -->
+	<select
+		id="list_ti_tingli"
+		resultType="java.util.Map">
+		SELECT
+		Id tingli_id,
+		k101_01 tingli_biaoti,
+		k101_02 tingli_type_d,
+		(case when k101_02='1'then '听选题'
+		when k101_02='2'then '听填题' end) tingli_type_m,
+		k101_03 tingli_timu,
+		k101_04 tingli_yinpin,
+		k101_05 tingli_miaoshu,
+		k101_06 tingli_yaoqiu,
+		k101_07 tingli_wenbenneirong,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1') ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k101 a
+		where 1=1
+		and a.type =#{danyuan_id}
+		<!-- 选择不同的听力类型题 -->
+		<if test="tingli_type_d != null and tingli_type_d !=''">
+			and a.k101_02=#{tingli_type_d}
+		</if>
+	</select>
+
+	<!-- 阅读是多表的 -->
+	<select
+		id="list_ti_yuedu"
+		resultType="java.util.Map">
+		SELECT
+		id yuedu_id,
+		k106_01 yuedu_timu,
+		k106_02 yuedu_pianmu,
+		k106_03 yuedu_neirong,
+		k106_04 yuedu_tupian,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1') ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k106 a
+		where 1=1
+		and a.type =#{danyuan_id}
+		order by yuedu_pianmu
+	</select>
+	<!-- 作文是多表的 -->
+	<select
+		id="list_ti_zuowen"
+		resultType="java.util.Map">
+		SELECT
+		Id zuowen_id,
+		k109_01 zuowen_biaoti,
+		k109_02 zuowen_biaoti2,
+		k109_03 zuowen_timu,
+		k109_04 zuowen_kaitou,
+		k109_05 zuowen_miaoshu,
+		k109_08 zuowen_ziyuan,
+		<!-- //是否是已经布置的内容(布置过吗?1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_02 = #{neirong_type_d} and t104_03 =a.id and t104_04 in(select id from t101 where t101_09=#{laoshi_id} AND t101_13='1') ) >0 then '1' else '0' end) sf_old,
+		<!-- //是否选中(1是0否) -->
+		(case when EXISTS(select 3 from t104 where t104_04= #{zuoye_id} and t104_02 = #{neirong_type_d} and t104_03 =a.id ) >0 then '1' else '0' end) sf_xz
+
+		FROM
+		k109 a
+		where 1=1
+		and a.k109_06 =#{danyuan_id}
+	</select>
+
+	<select
+		id="xiangqing_ti"
+		resultType="java.util.Map">
+		<choose>
+			<!-- 音标 -->
+			<when test="neirong_type_d == 0">
+				select
+				yb100_00 yinbiao_id,
+				yb100_01 yinbiao_m,
+				yb100_02 yinbiao_type_d,
+				yb100_03 yinbiao_yinpin
+				from yb100 where yb100_00= #{ti_id}
+			</when>
+			<!-- 课文 -->
+			<when test="neirong_type_d == 1">
+				SELECT
+				a.id xq_kewen_id,
+				a.k102_01 xq_kewen_m,
+				a.k102_02 xq_kewen_neirong_z,
+				a.k102_03 xq_kewen_neirong_y,
+				a.k102_04 xq_kewen_yinpin,
+				a.k102_05 xq_kewen_tupian
+				FROM
+				k102 a
+				where 1=1
+				and a.id =#{ti_id}
+			</when>
+			<!-- 单词 单表的 -->
+			<when test="neirong_type_d == 2">
+				SELECT
+				a.id xq_danci_id,
+				a.k103_01 xq_danci_neirong,
+				a.k103_02 xq_danci_ybfy,
+				a.k103_03 xq_danci_dy,
+				a.k103_04
+				xq_danci_dyfy,
+				a.k103_05 xq_danci_yinpin
+				FROM
+				k103 a
+				where 1=1
+				and
+				a.id
+				=#{ti_id}
+			</when>
+			<!-- 短语 单表的 -->
+			<when test="neirong_type_d == 8">
+				SELECT
+				a.id xq_danci_id,
+				a.k103_01 xq_danci_neirong,
+				a.k103_02 xq_danci_ybfy,
+				a.k103_03 xq_danci_dy,
+				a.k103_04
+				xq_danci_dyfy,
+				a.k103_05 xq_danci_yinpin
+				FROM
+				k103 a
+				where 1=1
+				and
+				a.id
+				=#{ti_id}
+			</when>
+			<!-- 句子详情 -->
+			<when test="neirong_type_d == 3">
+				SELECT
+				id xq_jvzi_id,
+				k104_02 xq_jvzi_neirong_z,
+				k104_03 xq_jvzi_neirong_y,
+				k104_04 xq_jvzi_yinpin,
+				ids order_00
+				FROM
+				k104
+				WHERE 1=1 AND
+				k104_01 =#{ti_id}
+				order by ids
+			</when>
+			<!-- 对话 -->
+			<when test="neirong_type_d == 4">
+				SELECT
+				id xq_duihua_id,
+				k108_02 xq_duihua_juese_m,
+				k108_03 xq_duihua_neirong_z,
+				k108_04 xq_duihua_neirong_y,
+				k108_05 xq_duihua_yinpin,
+				ids order_00
+				FROM
+				k108
+				WHERE 1=1 AND
+				k108_01 =#{ti_id}
+				order by ids
+			</when>
+			<!-- 听力 -->
+			<when test="neirong_type_d == 5">
+				SELECT
+				Id wenti_id,
+				k110_01 wentiming,
+				K110_03 wentineirong,
+				k110_05 zhengquedaan,
+				k110_06 daanjiexi,
+				k110_07 wenti_yinpin,
+				order_00
+				FROM
+				k110
+				where 1=1
+				and k110_02 = #{ti_id}
+				order by order_00
+			</when>
+			<!-- 阅读 -->
+			<when test="neirong_type_d == 6">
+				SELECT
+				id wenti_id,
+				k116_02 wentineirong,
+				k116_03 zhengquedaan,
+				k116_04 daanjiexi,
+				ids order_00
+				FROM
+				k116
+				where 1=1
+				and k116_01 = #{ti_id}
+				order by ids
+			</when>
+			<!-- 作文 -->
+			<when test="neirong_type_d == 7">
+				k109
+				SELECT
+				id wenti_id,
+				k116_02 wentineirong,
+				k116_03 zhengquedaan,
+				k116_04 daanjiexi,
+				ids order_00
+				FROM
+				k109
+				where 1=1
+				and k116_01 = #{ti_id}
+				order by ids
+			</when>
+			<otherwise>
+
+			</otherwise>
+		</choose>
+
+	</select>
+
+	<insert
+		id="add_zuoye"
+		parameterType="java.util.Map">
+		insert into t101 (id,t101_09,t101_13)
+		<trim
+			prefix="values ("
+			suffix=")"
+			suffixOverrides=",">
+			<if test="zuoye_id != null and zuoye_id !=''">
+				#{zuoye_id},
+			</if>
+			<if test="laoshi_id != null and laoshi_id !=''">
+				#{laoshi_id},
+			</if>
+			'0'
+		</trim>
+	</insert>
+
+	<insert
+		id="banji_zuoye_over"
+		parameterType="java.util.Map">
+		insert into t102 (t102_02, t102_03, t102_04, t102_05,t102_07,t102_08,t102_09,t102_10) values
+		<foreach
+			collection="arr"
+			item="date"
+			separator=",">
+			(#{date}, #{map.zuoye_id}, str_to_date(#{map.zuoye_time_s},'%Y-%m-%d %T'), str_to_date(#{map.zuoye_time_e},'%Y-%m-%d %T'),
+			#{map.zuoye_beizhu}, #{map.zuoye_m}, #{map.zuoye_yjwcsj}, #{map.zuoye_lx_d} )
+		</foreach>
+	</insert>
+
+	<insert
+		id="banji_zuoye_xiaoxi_over"
+		parameterType="java.util.Map">
+		INSERT INTO s101 (s101_01,s101_02,s101_03,s101_04,s101_06) SELECT '2','0',d112_02,#{xiaoxi_neirong},#{zuoye_id} FROM d112 WHERE d112_01 IN
+		<foreach
+			collection="arr"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</insert>
+	
+	<insert
+		id="banji_zuoye_xiaoxi_over_jz"
+		parameterType="java.util.Map">
+		INSERT INTO p100 (p101_01,p101_02,p101_03,p101_04,p101_06,p101_07) SELECT '2','0',d109_01,#{xiaoxi_neirong},d109_02,#{zuoye_id} 
+		FROM d109 WHERE d109_02 IN ( select d112_02 from d112 where d112_01 IN 
+		<foreach
+			collection="arr"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item}
+		</foreach>
+		)
+	</insert>
+
+	<update
+		id="upd_zuoye_banji"
+		parameterType="java.util.Map">
+		update
+		t102
+		<set>
+			<if test="zuoye_time_s != null and zuoye_time_s !=''">
+				t102_04 = str_to_date(#{zuoye_time_s}, '%Y-%m-%d %T'),
+			</if>
+			<if test="zuoye_time_e != null and zuoye_time_e !=''">
+				t102_05 = str_to_date(#{zuoye_time_e}, '%Y-%m-%d %T'),
+			</if>
+			<if test="zuoye_beizhu != null and zuoye_beizhu !=''">
+				t102_07 = #{zuoye_beizhu},
+			</if>
+			<if test="zuoye_m != null and zuoye_m !=''">
+				t102_08 = #{zuoye_m},
+			</if>
+			<if test="zuoye_yjwcsj != null and zuoye_yjwcsj !=''">
+				t102_09 = #{zuoye_yjwcsj},
+			</if>
+			<if test="zuoye_lx_d != null and zuoye_lx_d !=''">
+				t102_10 = #{zuoye_lx_d},
+			</if>
+		</set>
+		where t102_02 = #{banji_d} and t102_03=#{zuoye_id}
+	</update>
+
+	<select
+		id="jc_zuoye_shijian_list"
+		resultType="java.util.Map">
+		select date_format(a.t101_14, '%Y-%m-%d') zuoye_time,
+		(case
+		when WEEKDAY(a.t101_14) ='6' then '星期日'
+		when WEEKDAY(a.t101_14) ='0' then '星期一'
+		when WEEKDAY(a.t101_14) ='1' then '星期二'
+		when WEEKDAY(a.t101_14) ='2' then '星期三'
+		when WEEKDAY(a.t101_14) ='3' then '星期四'
+		when WEEKDAY(a.t101_14) ='4' then '星期五'
+		when WEEKDAY(a.t101_14) ='5' then '星期六'
+		end) zuoye_week
+		from t101 a
+		left join t102 on a.id=t102_03
+		left join t104 on a.id=t104_04
+		where 1=1 and t101_09= #{map.laoshi_id} and t101_13='1'
+		<if test="arr != null and arr !=''">
+			and t104_02 in
+			<foreach
+				collection="arr"
+				item="item"
+				index="index"
+				open="("
+				close=")"
+				separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<if test="map.zuoye_time_s != null and map.zuoye_time_s !=''">
+			and date_format(t102_04 , '%Y-%m-%d') =#{map.zuoye_time_s}
+		</if>
+		<if test="map.zuoye_time_e != null and map.zuoye_time_e !=''">
+			and date_format(t102_05 , '%Y-%m-%d') =#{map.zuoye_time_e}
+		</if>
+		<if test="map.zuoye_m != null and map.zuoye_m !=''">
+			and t102_08 like CONCAT('%',#{map.zuoye_m},'%')
+		</if>
+		<if test="map.banji_d != null and map.banji_d !=''">
+			and t102_02 = #{map.banji_d}
+		</if>
+		<if test="map.zuoye_status != null and map.zuoye_status !=''">
+			and is_time_between(t102_04,t102_05) = #{map.zuoye_status}
+		</if>
+		group by date_format(a.t101_14, '%Y-%m-%d')
+	</select>
+
+	<select
+		id="jc_zuoye_banji"
+		resultType="java.util.Map">
+		select DISTINCT
+		t102_02 banji_d,
+		(select d107_01 from d107 where d107_03=t102_02) banji_m,
+		(select d111_01 from d111 where d111_02='年级' and d111_03=(select d107_04 from d107 where d107_03=t102_02))nianji_m,
+		(select count(1) from d112 where d112_01 =t102_02)banji_rs,
+		if(t102_06 is not null,t102_06,0) zuoye_wcrs,
+		( select IFNULL(ROUND(AVG(hw101_04),2) ,0) pjf FROM hw101 WHERE hw101_03 =t102_03 AND hw101_02 IN (select d112_02 from d112 where d112_01=t102_02 ))zy_bj_defen,
+		t102_03 zuoye_id,
+		date_format(t102_04, '%Y-%m-%d %T') zuoye_time_s,
+		date_format(t102_05, '%Y-%m-%d %T') zuoye_time_e,
+		t102_07 zuoye_beizhu,		
+		t102_08 zuoye_m,
+		t102_09 zuoye_yjwcsj,
+		t102_10 zuoye_lx_d
+		from t102
+		left join t104 on t102_03=t104_04
+		where 1=1 
+			and t102_03 in (select id from t101 where t101_09 = #{map.laoshi_id} and t101_13='1')
+		<if test="arr != null and arr !=''">
+			and t104_02 in
+			<foreach
+				collection="arr"
+				item="item"
+				index="index"
+				open="("
+				close=")"
+				separator=",">
+				#{item}
+			</foreach>
+		</if>
+		<if test="map.zuoye_time_s != null and map.zuoye_time_s !=''">
+			and date_format(t102_04 , '%Y-%m-%d') =#{map.zuoye_time_s}
+		</if>
+		<if test="map.zuoye_time_e != null and map.zuoye_time_e !=''">
+			and date_format(t102_05 , '%Y-%m-%d') =#{map.zuoye_time_e}
+		</if>
+		<if test="map.zuoye_m != null and map.zuoye_m !=''">
+			and t102_08 like CONCAT('%',#{map.zuoye_m},'%')
+		</if>
+		<if test="map.banji_d != null and map.banji_d !=''">
+			and t102_02 = #{map.banji_d}
+		</if>
+		<if test="zuoye_status != null and zuoye_status !=''">
+			and is_time_between(t102_04,t102_05) = #{zuoye_status}
+		</if>
+		<if test="zy_bz_o_time != null and zy_bz_o_time !=''">
+			and (select date_format(t101_14 , '%Y-%m-%d') from t101 where t101.id =t102_03  ) = #{zy_bz_o_time}
+		</if>
+		
+
+	</select>
+
+	<select
+		id="xx_list"
+		resultType="java.util.Map">
+		select t103_01 xx_id,
+		t103_02 xx_type_d,
+		t103_03 xx_neirong,
+		t103_04 xx_status_d,
+		t103_06 xx_biaoti,
+		date_format(t103_07, '%Y-%m-%d %T') xx_time,
+		t102_02 banji_d,
+		t102_03 zuoye_id,
+		t102_08 zuoye_m,
+		date_format(t102_04, '%Y-%m-%d %T') zuoye_time_s,
+		date_format(t102_05, '%Y-%m-%d %T') zuoye_time_e
+
+		from t103 left join t102 on t102_01=t103_08
+		where 1=1 and t103_05=#{laoshi_id}
+		<if test="xx_status_d != null and xx_status_d !=''">
+			and t103_04= #{xx_status_d}
+		</if>
+	</select>
+
+	<delete
+		id="del_laoshi_xx"
+		parameterType="java.util.Map">
+		delete from
+		t103
+		where t103_01 in
+		<foreach
+			collection="arr"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- <select id="list_yinbiao" resultType="java.util.Map"> select t103_01 xx_id, t103_02 xx_type_d, t103_03 xx_neirong, t103_04 xx_status_d from t103 where 1=1 and t103_05=#{laoshi_id} <if test="xx_status_d != null and xx_status_d !=''"> and t103_04= #{xx_status_d} </if> </select> -->
+
+
+	<update
+		id="upd_zy_jieshu"
+		parameterType="java.util.Map">
+		update
+		t102
+		<set>
+			t102_12='9'
+		</set>
+		where t102_01 in
+		<foreach
+			collection="list"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item.zy_bj_id}
+		</foreach>
+	</update>
+
+	<insert
+		id="ins_xx_zy_jieshu"
+		parameterType="java.util.Map">
+		insert into t103 (t103_02, t103_03, t103_05, t103_06,t103_08) values
+		<foreach
+			collection="list"
+			item="item"
+			separator=",">
+			('2', CONCAT('您布置的',#{item.banji_m},'的作业',#{item.zuoye_m},'已交齐,请及时检查') , #{laoshi_id}, '作业交齐通知', #{item.zy_bj_id})
+		</foreach>
+	</insert>
+
+	<update
+		id="out_weixin_id"
+		parameterType="java.util.Map">
+		update
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		<set>
+			d101_17 = null,
+		</set>
+		where Id = #{user_id}
+	</update>
+
+
+	<update
+		id="upd_xx_yidu"
+		parameterType="java.util.Map">
+		update
+		t103
+		<set>
+			t103_04='1'
+		</set>
+		where t103_01 in
+		<foreach
+			collection="arr"
+			item="item"
+			index="index"
+			open="("
+			close=")"
+			separator=",">
+			#{item}
+		</foreach>
+	</update>
+
+	<update
+		id="bd_weixin_id"
+		parameterType="java.util.Map">
+		update
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		<set>
+			d101_17 = #{user_weixin_id},
+		</set>
+		where Id = #{user_id}
+	</update>
+	
+	<update
+		id="xiugaiUser_sj"
+		parameterType="java.util.Map">
+		update
+		<choose>
+			<when test="usertype_code == 5 ">
+				d1015
+			</when>
+			<when test="usertype_code == 4 ">
+				d1014
+			</when>
+			<when test="usertype_code == 3 ">
+				d1013
+			</when>
+			<when test="usertype_code == 2 ">
+				d1012
+			</when>
+			<when test="usertype_code == 1 ">
+				d1011
+			</when>
+			<when test="usertype_code == 0 ">
+				d1010
+			</when>
+
+		</choose>
+		<set>
+			d101_12 = #{user_dianhua},
+		</set>
+		where Id = #{user_id}
+	</update>
+
+</mapper>

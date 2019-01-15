@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.kwld.dao.TextType_di" >
+ <!-- 添加类型 -->
+  <insert id="addTextType" parameterType="java.util.Map" >
+    insert into texttype
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="type != null and type !=''" >
+        type,
+      </if>
+      <if test="jclx != null and jclx !=''" >
+        t01,
+      </if>
+      <if test="xd != null and xd !=''" >
+        t02,
+      </if>
+      <if test="nj != null and nj !=''" >
+        t03,
+      </if>
+      <if test="sxc != null and sxc !=''" >
+        t04,
+      </if>
+      <if test="dy != null and dy !=''" >
+        t05,
+      </if>
+      <if test="photo != null and photo !=''" >
+        t06,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+     <if test="type != null and type !=''" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="jclx != null and jclx !=''" >
+        #{jclx,jdbcType=VARCHAR},
+      </if>
+      <if test="xd != null and dx !=''" >
+        #{xd,jdbcType=VARCHAR},
+      </if>
+      <if test="nj != null and nj !=''" >
+        #{nj,jdbcType=VARCHAR},
+      </if>
+      <if test="sxc != null and sxc !=''" >
+        #{sxc,jdbcType=VARCHAR},
+      </if>
+      <if test="dy != null and dy !=''" >
+        #{dy,jdbcType=VARCHAR},
+      </if>
+      <if test="photo != null and photo !=''" >
+        #{photo,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <!-- 查询，根据五个字段进行查询 -->
+  <select id="findByFive" resultType="java.util.Map">
+  SELECT 
+ t.type,
+ t.t01 jclx,
+ t.t02 xd,
+ t.t03 nj,
+ t.t04 sxc,
+ t.t05 dy,
+ t.t06 photo
+FROM texttype t
+WHERE  1=1
+<if test="jclx !=null and jclx !=''">
+AND t.`t01`=#{jclx,jdbcType=VARCHAR}
+</if>
+<if test="xd !=null and xd !=''">
+AND t.`t02`=#{xd,jdbcType=VARCHAR}
+</if>
+<if test="nj !=null and nj !=''">
+AND t.`t03`=#{nj,jdbcType=VARCHAR}
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.`t04`=#{sxc,jdbcType=VARCHAR}
+</if>
+<if test="dy !=null and dy !=''">
+AND t.`t05`=#{dy,jdbcType=VARCHAR}
+</if>
+<if test="type !=null and type !=''">
+AND t.`type`=#{type,jdbcType=VARCHAR}
+</if>
+  </select>
+ 
+ <!-- 修改 -->
+ <update id="updatePhoto">
+ update texttype
+ <set >
+<if test="photo !=null and photo !=''">
+t06=#{photo,jdbcType=VARCHAR}
+</if>
+ </set>
+ where type=#{type,jdbcType=VARCHAR}
+ </update>
+</mapper>

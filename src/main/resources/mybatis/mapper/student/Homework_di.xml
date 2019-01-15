@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.student.text.dao.Homework_di" >
+<insert id="saveStuHomework"  parameterType="java.util.Map">
+insert into hw101
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stu_hw_id != null and stu_hw_id !=''" >
+hw101_01,
+</if>
+<if test="stuid != null and stuid !=''" >
+hw101_02,
+</if>
+<if test="hwid != null and hwid !=''" >
+hw101_03,
+</if>
+<if test="scoreAll != null and scoreAll !=''" >
+hw101_04,
+</if>
+<if test="start == null || start ==''">
+hw101_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stu_hw_id != null and stu_hw_id !=''" >
+#{stu_hw_id,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="hwid != null and hwid !=''" >
+#{hwid,jdbcType=VARCHAR},
+</if>
+<if test="scoreAll != null and scoreAll !=''" >
+#{scoreAll,jdbcType=DOUBLE},
+</if>
+<if test="start == null || start ==''">
+sysdate(),
+</if>
+</trim>
+</insert>
+
+<insert id="saveStuHomeWorkType"  parameterType="java.util.Map">
+insert into hw102
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="stu_hw_id != null and stu_hw_id !=''" >
+hw102_01,
+</if>
+<if test="hw_type != null and hw_type !=''" >
+hw102_02,
+</if>
+<if test="hw_content != null and hw_content !=''" >
+hw102_03,
+</if>
+<if test="hw_contentid != null and hw_contentid !=''" >
+hw102_04,
+</if>
+<if test="score != null and score !=''" >
+hw102_05,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="stu_hw_id != null and stu_hw_id !=''" >
+#{stu_hw_id,jdbcType=VARCHAR},
+</if>
+<if test="hw_type != null and hw_type !=''" >
+#{hw_type,jdbcType=VARCHAR},
+</if>
+<if test="hw_content != null and hw_content !=''" >
+#{hw_content,jdbcType=VARCHAR},
+</if>
+<if test="hw_contentid != null and hw_contentid !=''" >
+#{hw_contentid,jdbcType=VARCHAR},
+</if>
+<if test="score != null and score !=''" >
+#{score,jdbcType=DOUBLE},
+</if>
+</trim>
+</insert>
+<insert id="saveStuHomeWorkAnswer"  parameterType="java.util.Map">
+insert into hw103
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="hw_contentid != null and hw_contentid !=''" >
+hw103_01,
+</if>
+<if test="hw_answerId != null and hw_answerId !=''" >
+hw103_02,
+</if>
+<if test="hw_video != null and hw_video !=''" >
+hw103_03,
+</if>
+<if test="hw_score != null and hw_score !=''" >
+hw103_04,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="hw_contentid != null and hw_contentid !=''" >
+#{hw_contentid,jdbcType=VARCHAR},
+</if>
+<if test="hw_answerId != null and hw_answerId !=''" >
+#{hw_answerId,jdbcType=VARCHAR},
+</if>
+<if test="hw_video != null and hw_video !=''" >
+#{hw_video,jdbcType=VARCHAR},
+</if>
+<if test="hw_score != null and hw_score !=''" >
+#{hw_score,jdbcType=DOUBLE},
+</if>
+</trim>
+</insert>
+
+<update id="updateStuHomework"  parameterType="java.util.Map">
+update hw101
+ <set>
+ <if test="scoreAll != null and scoreAll !=''" >
+  hw101_04 = #{scoreAll,jdbcType=DOUBLE},
+</if>
+ <if test="end == null || end ==''" >
+  hw101_06 = sysdate(),
+</if>
+
+ </set>
+ WHERE 1=1
+ <if test="stu_hw_id != null and stu_hw_id !=''" >
+AND hw101_01 = #{stu_hw_id,jdbcType=VARCHAR}
+</if>
+<if test="stuid != null and stuid !=''" >
+AND hw101_02 = #{stuid,jdbcType=VARCHAR}
+</if>
+<if test="hwid != null and hwid !=''" >
+AND hw101_03 = #{hwid,jdbcType=VARCHAR}
+</if>
+</update>
+
+<update id="updateStuHomeWorkType"  parameterType="java.util.Map">
+update hw102
+set
+hw102_05 = #{score,jdbcType=DOUBLE}
+WHERE 1=1
+<if test="hw_contentid != null and hw_contentid !=''" >
+AND hw102_04 = #{hw_contentid,jdbcType=VARCHAR}
+</if>
+</update>
+
+<update id="updateStuHomeWorkAnswer" parameterType="java.util.Map">
+update hw103
+ <set>
+<if test="hw_video != null and hw_video !=''" >
+hw103_03 = #{hw_video,jdbcType=VARCHAR},
+</if>
+<if test="hw_score != null and hw_score !=''" >
+hw103_04 = #{hw_score,jdbcType=DOUBLE},
+</if>
+ </set>
+ WHERE 1=1
+<if test="hw_contentid != null and hw_contentid !=''" >
+AND hw103_01 = #{hw_contentid,jdbcType=VARCHAR}
+</if>
+<if test="hw_answerId != null and hw_answerId !=''" >
+AND hw103_02 = #{hw_answerId,jdbcType=VARCHAR}
+</if>
+</update>
+<select id="findStuHomework" resultType="java.util.Map">
+select 
+hw101_01 stu_hw_id,
+hw101_02 stuid,
+hw101_03 hwid,
+hw101_04 scoreAll,
+hw101_06 endTime
+from hw101
+where hw101_02=#{stuid,jdbcType=VARCHAR}
+and hw101_03=#{hwid,jdbcType=VARCHAR}
+</select>
+
+<select id="findStuHomeWorkType2" resultType="java.util.Map">
+select 
+hw102_04 hw_contentid,
+hw102_05 score
+from hw102
+where hw102_01=#{stu_hw_id,jdbcType=VARCHAR}
+</select>
+
+
+<select id="findStuHomeWorkType" resultType="java.util.Map">
+select 
+hw102_04 hw_contentid,
+hw102_05 score
+from hw102
+where hw102_01=#{stu_hw_id,jdbcType=VARCHAR}
+and hw102_02=#{hw_type,jdbcType=VARCHAR}
+and hw102_03=#{hw_content,jdbcType=VARCHAR}
+</select>
+<select id="findStuHomeWorkAnswer" resultType="java.util.Map">
+select 
+id,
+hw103_03 hw_video,
+hw103_04 hw_score
+from hw103
+where hw103_02=#{hw_answerId,jdbcType=VARCHAR}
+<if test="hw_contentid !=null and hw_contentid !=''">
+AND hw103_01=#{hw_contentid,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 根据班级代码查询学生作业 -->
+<select id="findByHomework" resultType="java.util.Map">
+SELECT
+t.`t102_08` homewordName,
+t.`t102_06` finishPeople,
+t.`t102_05` endTime,
+DATE_FORMAT(t.`t102_05`, '%Y-%m-%d') end,
+DATE_FORMAT(t.`t102_04`, '%Y-%m-%d') start,
+t.`t102_04` startTime,
+t.`t102_03` hwid,
+t.`t102_10` homework_cishu
+FROM t102 t,d112 d
+WHERE d.`d112_01`=t.`t102_02`
+AND d.`d112_02`=#{stuid,jdbcType=VARCHAR}
+<if test="startTime != null and startTime !=''">
+AND t.`t102_04` LIKE '%${startTime}%'
+</if>
+order by endTime DESC
+</select>
+<select id="findByHwid" resultType="java.util.Map">
+SELECT
+t102_01 classhomewordId,
+t.`t102_08` homeworkName,
+t.`t102_05` endTime,
+DATE_FORMAT(t.`t102_05`, '%Y-%m-%d') end,
+t.`t102_04` startTime,
+t.`t102_03` hwid,
+t.`t102_06` finishPeople,
+t.`t102_10` homework_cishu
+FROM t102 t
+WHERE t.t102_03=#{hwid,jdbcType=VARCHAR}
+</select>
+<select id="findByHwType" resultType="java.util.Map">
+SELECT
+t.`t104_02` hw_type,
+t.`t104_03` hw_content,
+t.`t104_05` type,
+t.`t104_06` jiaocaiid,
+t.`t104_07` typeName
+FROM t104 t
+WHERE t.t104_04=#{hwid,jdbcType=VARCHAR}
+<if test="hw_type !=null and hw_type !=''">
+AND t.`t104_02` = #{hw_type,jdbcType=VARCHAR}
+</if>
+<if test="hw_content !=null and hw_content !=''">
+AND t.`t104_03` = #{hw_content,jdbcType=VARCHAR}
+</if>
+
+</select>
+
+
+
+<select id="findByType" resultType="java.util.Map">
+SELECT
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM texttype
+WHERE type=#{type,jdbcType=VARCHAR}
+</select>
+
+<update id="updateFinshHw" parameterType="java.util.Map">
+update t102
+ <set>
+ <if test="finishPeople != null and finishPeople !=''" >
+  t102_06 = #{finishPeople,jdbcType=INTEGER},
+</if>
+ </set>
+ WHERE t102_03 = #{hwid,jdbcType=VARCHAR}
+</update>
+
+<delete id="delStuHomework" parameterType="java.util.Map">
+DELETE FROM hw101
+WHERE hw101_01=#{stu_hw_id,jdbcType=VARCHAR}
+</delete>
+<delete id="delStuHomeWorkType" parameterType="java.util.Map">
+DELETE FROM hw102
+WHERE hw102_01=#{stu_hw_id,jdbcType=VARCHAR}
+</delete>
+<delete id="delStuHomeWorkAnswer" parameterType="java.util.Map">
+DELETE FROM hw103
+WHERE id=#{id,jdbcType=VARCHAR}
+</delete>
+
+<select id="findByContentId" resultType="java.util.Map">
+select 
+hw102_04 hw_contentid,
+hw102_05 score
+from hw102
+where hw102_01=#{stu_hw_id,jdbcType=VARCHAR}
+</select>
+<select id="findByAnswerId" resultType="java.util.Map" >
+select 
+hw103_02 hw_answerId,
+hw103_03 hw_video,
+hw103_04 hw_score
+from hw103
+where hw103_01=#{hw_contentid,jdbcType=VARCHAR}
+</select>
+<select id="findByEveryHomework" resultType="java.util.Map">
+select 
+h.hw103_03 hw_video,
+h.hw103_04 hw_score
+from hw103 h,hw102 h102,hw101 h101
+where 1=1
+AND h101.`hw101_02`=#{stuid,jdbcType=VARCHAR}
+AND h101.`hw101_03`=#{hwid,jdbcType=VARCHAR}
+AND h101.`hw101_01`=h102.`hw102_01`
+AND h102.`hw102_04`=h.`hw103_01`
+AND h.`hw103_02`=#{hw_answerId,jdbcType=VARCHAR}
+AND  h102.`hw102_03`=#{hw_content,jdbcType=VARCHAR}
+AND h102.`hw102_02`=#{hw_type,jdbcType=VARCHAR}
+</select>
+
+<!-- updateStuHomeWorkType -->
+<select id="findByContentByScore" resultType="java.util.Map">
+SELECT 
+hw102_05 score
+FROM hw101 h1,hw102 h2
+WHERE h2.`hw102_01` = h1.`hw101_01`
+AND h2.`hw102_03`=#{hw_content,jdbcType=VARCHAR}
+AND h1.`hw101_02`=#{stuid,jdbcType=VARCHAR}
+</select>
+
+<!-- 添加家长消息表 -->
+<insert id="saveParentNews" parameterType="java.util.Map">
+insert into p100
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="newtype == null || newtype ==''" >
+p101_01,
+</if>
+<if test="newstate == null || newstate ==''" >
+p101_02,
+</if>
+<if test="pid != null and pid !=''" >
+p101_03,
+</if>
+<if test="newcontent != null and newcontent !=''" >
+p101_04,
+</if>
+<if test="stuid != null and stuid !=''" >
+p101_06,
+</if>
+<if test="hwid != null and hwid !=''" >
+p101_07,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="newtype == null || newtype ==''" >
+'2',
+</if>
+<if test="newstate == null || newstate ==''" >
+'0',
+</if>
+<if test="pid != null and pid !=''" >
+#{pid,jdbcType=VARCHAR},
+</if>
+<if test="newcontent != null and newcontent !=''" >
+#{newcontent,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+<if test="hwid != null and hwid !=''" >
+#{hwid,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!-- 统计一个班级下的所有学生 -->
+<select id="countClassByStu" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM d112
+WHERE d112_01 = (SELECT d112_01
+FROM d112
+WHERE d112_02 = #{stuid,jdbcType=VARCHAR})
+</select>
+<!-- 统计完成作业的学生 -->
+<select id="countHomeWorkByStu" resultType="java.util.Map">
+SELECT COUNT(*)
+FROM hw101
+WHERE hw101_03= #{hwid,jdbcType=VARCHAR}
+</select>
+<!-- 添加作业交齐 老师消息表 -->
+<insert id="saveTeacherNews" parameterType="java.util.Map">
+insert into t103
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="newtype == null || newtype ==''" >
+t103_02,
+</if>
+<if test="newstate == null || newstate ==''" >
+t103_04,
+</if>
+<if test="pid != null and pid !=''" >
+t103_05,
+</if>
+<if test="newcontent != null and newcontent !=''" >
+t103_03,
+</if>
+<if test="newtitle == null || newtitle ==''" >
+t103_06,
+</if>
+<if test="classhomewordId != null and classhomewordId !=''" >
+t103_08,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="newtype == null || newtype ==''" >
+'2',
+</if>
+<if test="newstate == null || newstate ==''" >
+'0',
+</if>
+<if test="pid != null and pid !=''" >
+#{pid,jdbcType=VARCHAR},
+</if>
+<if test="newcontent != null and newcontent !=''" >
+#{newcontent,jdbcType=VARCHAR},
+</if>
+<if test="newtitle == null || newtitle ==''" >
+'作业交齐通知',
+</if>
+<if test="classhomewordId != null and classhomewordId !=''" >
+#{classhomewordId,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<!--  -->
+<select id="findByTeaNews" resultType="java.util.Map">
+select * 
+from t103
+where t103_08=#{classhomewordId}
+</select>
+<!-- 查询家长学生表   根据学生查询所有的家长 -->
+<select id="findStuByPid" resultType="java.util.Map">
+SELECT d109_01 pid
+FROM d109
+WHERE d109_02=#{stuid}
+</select>
+<!-- 查询学生是否重新做作业 -->
+<select id="findByParent" resultType="java.util.Map">
+select *
+from p100
+where p101_06=#{stuid}
+and p101_07=#{hwid}
+and p101_03=#{pid}
+</select>
+
+
+<select id="findByScoreAll" resultType="java.util.Map">
+SELECT SUM(hw102_05) scoreAll
+FROM hw102
+WHERE hw102_01=#{stu_hw_id,jdbcType=VARCHAR}
+</select>
+
+<select id="selectByPid" resultType="java.util.Map">
+SELECT d113_01 pid
+FROM d113
+WHERE d113_02=(
+SELECT  d112_01
+FROM d112
+WHERE d112_02=#{stuid,jdbcType=VARCHAR})
+</select>
+</mapper>

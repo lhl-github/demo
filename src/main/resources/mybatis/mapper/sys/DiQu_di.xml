@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xljy.sys.dao.DiQu_di">
+
+
+	<select id="ChaDiQuListByJiBie" parameterType="java.util.Map"
+		resultType="map">
+		SELECT
+		d106_01 diqudaima,
+		d106_02 diquname,
+		d106_03 fudaima,
+		d106_04 jibie
+		FROM d106
+		WHERE 1=1
+		<if test="jibie != null and jibie !=''">
+		   and d106_04= #{jibie}
+		</if>
+		<if test="fudaima != null and fudaima !=''">
+		   and d106_03= #{fudaima}
+		</if>
+		
+	</select>
+</mapper>

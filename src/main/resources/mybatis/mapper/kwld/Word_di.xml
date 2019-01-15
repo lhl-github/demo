@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.kwld.dao.Word_di" >
+<!-- 查询 -->
+
+<select id="findAllWord" resultType="java.util.Map">
+SELECT 
+ DISTINCT k.id,
+ k.k103_01 word,
+ k.k103_02 zw,
+ k.k103_03 phrase,
+ k.k103_04 phraseTran,
+ k.k103_05 video,
+ k.k103_06 word_phrase,
+ k.type,
+ t.t06 photo
+FROM k103 k , texttype t 
+WHERE k.`type`=t.`type`
+<if test="id !=null and id !=''">
+AND k.id=#{id,jdbcType=VARCHAR}
+</if>
+<if test="type !=null and type !=''">
+AND t.`type`=#{type,jdbcType=VARCHAR}
+</if>
+<if test="word_phrase !=null and word_phrase !=''">
+AND  k.k103_06=#{word_phrase,jdbcType=VARCHAR}
+</if>
+order by ids
+</select>
+
+<!-- 添加 -->
+<insert id="addWord" parameterType="java.util.Map">
+  insert into k103
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null and id !=''" >
+        id,
+      </if>
+      <if test="word != null and word !=''" >
+        k103_01,
+      </if>
+      <if test="zw != null and zw !=''" >
+        k103_02,
+      </if>
+      <if test="phrase != null and phrase !=''" >
+        k103_03,
+      </if>
+       <if test="phraseTran != null and phraseTran !=''" >
+        k103_04,
+      </if>
+      <if test="video != null and video !=''" >
+        k103_05,
+      </if>
+       <if test="word_phrase != null and word_phrase !=''" >
+         k103_06,
+      </if>
+      <if test="type != null and type !=''" >
+        type,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null and id !=''" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="word != null and word !=''" >
+        #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="zw != null and zw !=''" >
+        #{zw,jdbcType=VARCHAR},
+      </if>
+      <if test="phrase != null and phrase !=''" >
+        #{phrase,jdbcType=VARCHAR},
+      </if>
+        <if test="phraseTran != null and phraseTran !=''" >
+          #{phraseTran,jdbcType=VARCHAR},
+      </if>
+      <if test="video != null and video !=''" >
+          #{video,jdbcType=VARCHAR},
+      </if>
+       <if test="word_phrase != null and word_phrase !=''" >
+         #{word_phrase,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+    </trim>
+</insert>
+<!-- 删除 -->
+<delete id="delWordById" parameterType="java.util.Map">
+ delete from k103
+    where id = #{id,jdbcType=VARCHAR}
+</delete>
+<!-- 修改 -->
+<update id="updateWord" parameterType="java.util.Map">
+ update k103
+    <set >
+      <if test="word != null and word !=''" >
+        k103_01 = #{word,jdbcType=VARCHAR},
+      </if>
+      <if test="zw != null and zw !=''" >
+        k103_02 = #{zw,jdbcType=VARCHAR},
+      </if>
+      <if test="phrase != null and phrase !=''" >
+        k103_03 = #{phrase,jdbcType=VARCHAR},
+      </if>
+      <if test="phraseTran != null and phraseTran !=''" >
+        k103_04 = #{phraseTran,jdbcType=VARCHAR},
+      </if>
+        <if test="video != null and video !=''" >
+        k103_05 = #{video,jdbcType=VARCHAR},
+      </if>
+       <if test="word_phrase != null and word_phrase !=''" >
+        k103_06 = #{word_phrase,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+</update>
+<!-- 查询是否存在此单词 -->
+<select id="findByContent" resultType="java.util.Map">
+SELECT 
+ DISTINCT k.id,
+ k.k103_01 word,
+ k.k103_02 zw,
+ k.k103_03 phrase,
+ k.k103_04 phraseTran,
+ k.k103_05 video,
+ k.k103_06 word_phrase,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t02` AND d111_05='43') xd,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy
+FROM k103 k , texttype t 
+WHERE k.`type`=t.`type`
+ <if test="word != null and word !=''" >
+and k.k103_01 = #{word,jdbcType=VARCHAR}
+</if>
+<if test="zw != null and zw !=''" >
+and k.k103_02 = #{zw,jdbcType=VARCHAR}
+</if>
+<if test="phrase != null and phrase !=''" >
+and k.k103_03 = #{phrase,jdbcType=VARCHAR}
+</if>
+<if test="phraseTran != null and phraseTran !=''" >
+and k.k103_04 = #{phraseTran,jdbcType=VARCHAR}
+</if>
+<if test="video != null and video !=''" >
+and k.k103_05 = #{video,jdbcType=VARCHAR}
+</if>
+<if test="word_phrase != null and word_phrase !=''" >
+and k.k103_06 = #{word_phrase,jdbcType=VARCHAR}
+</if>
+<if test="type != null and type !=''" >
+and k.type = #{type,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 根据type进行删除 -->
+<delete id="delWordByType" parameterType="java.util.Map">
+delete from k103
+    where type = #{type,jdbcType=VARCHAR}
+    and k103_06 = #{word_phrase,jdbcType=VARCHAR}
+</delete>
+
+<select id="findByID" resultType="java.util.Map">
+select 
+k.id,
+ k.k103_01 word,
+ k.k103_02 zw,
+ k.k103_03 phrase,
+ k.k103_04 phraseTran,
+ k.k103_05 video,
+ k.k103_06 word_phrase,
+  t.`t01` jclx,
+ t.`t02` xd,
+ t.`t03` nj,
+ t.`t04` sxc,
+ t.`t05` dy,
+ t.`t06` photo,
+t.type
+from k103 k,texttype t
+where t.type=k.type
+and k.type=#{type,jdbcType=VARCHAR}
+and k.k103_06 = #{word_phrase,jdbcType=VARCHAR}
+</select>
+
+<select id="findByType" resultType="java.util.Map">
+SELECT 
+ DISTINCT 
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t02` AND d111_05='43') xd,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy,
+ t.`t03` nj_d,
+ t.`t04` sxc_d,
+ t.`t05` dy_d,
+ t.`t06` photo,
+ k.k103_06 word_phrase,
+ k.type
+FROM k103 k , texttype t 
+WHERE k.`type`=t.`type`
+<if test="jclx !=null and jclx !=''">
+AND t.`t01`=#{jclx,jdbcType=VARCHAR}
+</if>
+<if test="xd !=null and xd !=''">
+AND t.`t02`=#{xd,jdbcType=VARCHAR}
+</if>
+<if test="nj !=null and nj !=''">
+AND t.`t03`=#{nj,jdbcType=VARCHAR}
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.`t04`=#{sxc,jdbcType=VARCHAR}
+</if>
+<if test="dy !=null and dy !=''">
+AND t.`t05`=#{dy,jdbcType=VARCHAR}
+</if>
+<if test="type !=null and type !=''">
+AND t.`type`=#{type,jdbcType=VARCHAR}
+</if>
+<if test="word_phrase != null and word_phrase !=''" >
+and k.k103_06 = #{word_phrase,jdbcType=VARCHAR}
+</if>
+</select>
+</mapper>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xljy.kwld.dao.ZuoWen_D">
+	<!-- 约定: _d代码 _m名称 -->
+	<!-- 目的：为dao接口方法提供sql语句配置 -->
+
+	<select id="findall" resultType="java.util.Map">
+		SELECT
+		Id zuowen_id,
+		k109_01 zuowen_biaoti,
+		k109_02 zuowen_biaoti2,
+		k109_03 zuowen_timu,
+		k109_04 zuowen_kaitou,
+		k109_05 zuowen_miaoshu,
+		k109_06 kewen_id,
+
+		texttype.t01 jiaocaileixing_d,
+		(select d111_01 from d111 where d111_02='教材类型' and d111_03=texttype.t01) jiaocaileixing_m,
+		texttype.t02 xueduan_d,
+		(select d111_01 from d111 where d111_02='学段' and d111_03= texttype.t02) xueduan_m,
+		texttype.t03 nianji_d,
+		(select d111_01 from d111 where d111_02='年级' and d111_03= texttype.t03) nianji_m,
+		texttype.t04 shangxiace_d,
+		(select d111_01 from d111 where d111_02='上下册' and d111_03= texttype.t04) shangxiace_m,
+		texttype.t05 danyuan_d,
+		(select d111_01 from d111 where d111_02='单元' and d111_03= texttype.t05) danyuan_m,
+		texttype.t06 xuexiao_d,
+		(select d108_02 from d108 where d108_01= texttype.t06) xuexiao_m
+
+		FROM
+		k109
+		left join
+		texttype on
+		k109_06=texttype.type
+		where 1=1
+
+		<if test="zuowen_id != null and zuowen_id !='' ">
+			and Id = #{zuowen_id}
+		</if>
+		<if test="zuowen_biaoti != null and zuowen_biaoti !='' ">
+			and k109_01 like CONCAT('%',#{zuowen_biaoti},'%')
+		</if>
+		<if test="zuowen_biaoti2 != null and zuowen_biaoti2 !='' ">
+			and k109_02 = #{zuowen_biaoti2}
+		</if>
+		<if test="zuowen_timu != null and zuowen_timu !='' ">
+			and k109_03 like CONCAT('%',#{zuowen_timu},'%')
+		</if>
+		<if test="zuowen_kaitou != null and zuowen_kaitou !='' ">
+			and k109_04 = #{zuowen_kaitou}
+		</if>
+		<if test="zuowen_miaoshu != null and zuowen_miaoshu !='' ">
+			and k109_05 = #{zuowen_miaoshu}
+		</if>
+		<if test="kewen_id != null and kewen_id !='' ">
+			and k109_06 = #{kewen_id}
+		</if>
+		<if test="jiaocaileixing_d != null and jiaocaileixing_d !='' ">
+			and texttype.t01 = #{jiaocaileixing_d}
+		</if>
+		<if test="xueduan_d != null and xueduan_d !='' ">
+			and texttype.t02 = #{xueduan_d}
+		</if>
+		<if test="nianji_d != null and nianji_d !='' ">
+			and texttype.t03 = #{nianji_d}
+		</if>
+		<if test="shangxiace_d != null and shangxiace_d !='' ">
+			and texttype.t04 = #{shangxiace_d}
+		</if>
+		<if test="danyuan_d != null and danyuan_d !='' ">
+			and texttype.t05 = #{danyuan_d}
+		</if>
+		<if test="xuexiao_d != null and xuexiao_d !='' ">
+			and texttype.t06 = #{xuexiao_d}
+		</if>
+	</select>
+
+
+	<select id="find_allyaodian" resultType="java.util.Map">
+
+		SELECT
+		Id yaodian_id,
+		k112_01 yaodian_biaoti,
+		k112_02 yaodian_neirong
+		FROM
+		k112
+		where 1=1
+		and
+		k112_03 = #{zuowen_id}
+	</select>
+
+	<select id="find_allzhuyidian" resultType="java.util.Map">
+		SELECT
+		Id zhuyidian_id,
+		k113_01 zhuyidian_neirong
+		FROM
+		k113
+		where 1=1
+		and k113_02 = #{zuowen_id}
+	</select>
+
+
+	<select id="find_kewendanyuan" resultType="java.util.Map">
+
+		SELECT
+		TYPE kewen_id,
+		t01 jiaocaileixing_d,
+		t02 xueduan_d,
+		t03 nianji_d,
+		t04 shangxiace_d,
+		t05 danyuan_d,
+		t06 xuexiao_d
+		FROM
+		texttype
+		where 1=1
+
+		<if test="jiaocaileixing_d != null and jiaocaileixing_d !='' ">
+			and texttype.t01 = #{jiaocaileixing_d}
+		</if>
+		<if test="xueduan_d != null and xueduan_d !='' ">
+			and texttype.t02 = #{xueduan_d}
+		</if>
+		<if test="nianji_d != null and nianji_d !='' ">
+			and texttype.t03 = #{nianji_d}
+		</if>
+		<if test="shangxiace_d != null and shangxiace_d !='' ">
+			and texttype.t04 = #{shangxiace_d}
+		</if>
+		<if test="danyuan_d != null and danyuan_d !='' ">
+			and texttype.t05 = #{danyuan_d}
+		</if>
+		<if test="xuexiao_d != null and xuexiao_d !='' ">
+			and texttype.t06 = #{xuexiao_d}
+		</if>
+
+
+	</select>
+
+	<!--insert 增加 useGeneratedKeys,keyProperty 返回主键集合 useGeneratedKeys：必须设置为true，否则无法获取到主键id。 
+		keyProperty：设置为POJO对象的主键id属性名称。 keyColumn：设置为数据库记录的主键id字段名称 -->
+
+
+	<!-- 添加课文单元 -->
+	<insert id="add_kewendanyuan" parameterType="java.util.Map">
+
+		INSERT INTO texttype (
+		TYPE,
+		t01,
+		t02,
+		t03,
+		t04,
+		t05
+		<if test="map.xuexiao_d != null and map.xuexiao_d !='' ">
+			,t06
+		</if>
+
+		)
+		VALUES
+		(
+		#{uuid_kewendanyuan},
+		#{map.jiaocaileixing_d},
+		#{map.xueduan_d},
+		#{map.nianji_d},
+		#{map.shangxiace_d},
+		#{map.danyuan_d}
+		<if test="map.xuexiao_d != null and map.xuexiao_d !='' ">
+			,#{map.xuexiao_d}
+		</if>
+
+		)
+
+	</insert>
+
+
+	<!-- 添加作文 -->
+	<insert id="add_zuowen">
+
+		INSERT INTO k109 (
+		Id,
+		<if test=" map.zuowen_biaoti != null and map.zuowen_biaoti !='' ">
+			k109_01,
+		</if>
+		<if test=" map.zuowen_biaoti2 != null and map.zuowen_biaoti2 !='' ">
+			k109_02,
+		</if>
+		<if test=" map.zuowen_timu != null and map.zuowen_timu !='' ">
+			k109_03,
+		</if>
+		<if test=" map.zuowen_kaitou != null and map.zuowen_kaitou !='' ">
+			k109_04,
+		</if>
+		<if test=" map.zuowen_miaoshu != null and map.zuowen_miaoshu !='' ">
+			k109_05,
+		</if>
+		<if test=" map.zuowen_wenjian != null and map.zuowen_wenjian !='' ">
+			k109_08,
+		</if>
+		
+		k109_06
+		)
+		VALUES
+		(
+		#{uuid_zuowen},
+		<if test=" map.zuowen_biaoti != null and map.zuowen_biaoti !='' ">
+			#{map.zuowen_biaoti},
+		</if>
+		<if test=" map.zuowen_biaoti2 != null and map.zuowen_biaoti2 !='' ">
+			#{map.zuowen_biaoti2},
+		</if>
+		<if test=" map.zuowen_timu != null and map.zuowen_timu !='' ">
+			#{map.zuowen_timu},
+		</if>
+		<if test=" map.zuowen_kaitou != null and map.zuowen_kaitou !='' ">
+			#{map.zuowen_kaitou},
+		</if>
+		<if test=" map.zuowen_miaoshu != null and map.zuowen_miaoshu !='' ">
+			#{map.zuowen_miaoshu},
+		</if>
+		<if test=" map.zuowen_wenjian != null and map.zuowen_wenjian !='' ">
+			#{map.zuowen_wenjian},
+		</if>
+
+		#{uuid_kewendanyuan}
+
+		)
+
+	</insert>
+
+	<!-- 添加作文要点 -->
+	<insert id="add_yaodian">
+		INSERT INTO k112 (
+		<if test=" map.yaodian_biaoti != null and map.yaodian_biaoti !='' ">
+			k112_01,
+		</if>
+		<if
+			test=" map.yaodian_neirong != null and map.yaodian_neirong !='' ">
+			k112_02,
+		</if>
+		k112_03
+		)
+		VALUES
+		(
+		<if test=" map.yaodian_biaoti != null and map.yaodian_biaoti !='' ">
+			#{map.yaodian_biaoti},
+		</if>
+		<if
+			test=" map.yaodian_neirong != null and map.yaodian_neirong !='' ">
+			#{map.yaodian_neirong},
+		</if>
+		<if test=" map.daanjiexi != null and map.daanjiexi !='' ">
+			#{map.daanjiexi},
+		</if>
+		#{uuid_zuowen}
+		)
+
+	</insert>
+
+
+	<!-- 添夹作文注意点 -->
+	<insert id="add_zhuyidian">
+		INSERT INTO k113 (
+		<if
+			test=" map.zhuyidian_neirong != null and map.zhuyidian_neirong !='' ">
+			k113_01,
+		</if>
+		k113_02
+		)
+		VALUES
+		(
+		<if
+			test=" map.zhuyidian_neirong != null and map.zhuyidian_neirong !='' ">
+			#{map.zhuyidian_neirong},
+		</if>
+		#{uuid_zuowen}
+		)
+
+	</insert>
+
+
+
+	<update id="xiugai_zuowen">
+		UPDATE
+		k109
+		<set>
+			<if test=" map.zuowen_biaoti != null and map.zuowen_biaoti !='' ">k109_01 = #{map.zuowen_biaoti},</if>
+			<if
+				test=" map.zuowen_biaoti2 != null and map.zuowen_biaoti2 !='' ">k109_02 = #{map.zuowen_biaoti2},</if>
+			<if test=" map.zuowen_timu != null and map.zuowen_timu !='' ">k109_03 = #{map.zuowen_timu},</if>
+			<if test=" map.zuowen_kaitou != null and map.zuowen_kaitou !='' ">k109_04 = #{map.zuowen_kaitou},</if>
+			<if
+				test=" map.zuowen_miaoshu != null and map.zuowen_miaoshu !='' "> k109_05 = #{map.zuowen_miaoshu},</if>
+		</set>
+
+		WHERE Id = #{map.zuowen_id}
+	</update>
+
+
+	<update id="xiugai_yaodian">
+
+		UPDATE
+		k112
+		<set>
+			<if test=" yaodian_biaoti != null and yaodian_biaoti !='' ">k112_01 = #{yaodian_biaoti},</if>
+			<if test=" yaodian_neirong != null and yaodian_neirong !='' ">k112_02 = #{yaodian_neirong},</if>
+		</set>
+
+		WHERE Id = #{yaodian_id}
+
+	</update>
+
+	<update id="xiugai_zhuyidian">
+		UPDATE
+		k113
+		set
+		<if test=" zhuyidian_neirong != null and zhuyidian_neirong !='' ">
+			k113_01 = #{zhuyidian_neirong}
+		</if>
+		<if test=" zhuyidian_neirong == null or zhuyidian_neirong =='' ">
+			k113_01 = null
+		</if>
+		WHERE Id = #{zhuyidian_id}
+
+	</update>
+
+
+	<delete id="del_yaodian">
+		DELETE
+		FROM
+		k112
+		WHERE Id = #{yaodian_id}
+
+	</delete>
+
+	<delete id="del_zhuyidian">
+		DELETE
+		FROM
+		k113
+		WHERE Id = #{zhuyidian_id}
+
+	</delete>
+	
+
+</mapper>

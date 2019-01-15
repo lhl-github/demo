@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.student.text.dao.StuNews_di" >
+
+<!-- 当进入主页时，有个铃铛会显示有未读的消息多少条（本用户下的未读消息个数） -->
+<select id="findByUnReadCount" resultType="java.lang.Integer">
+SELECT
+COUNT(*)
+FROM s101 s
+WHERE s101_02='0'
+AND s.s101_03=#{stuid,jdbcType=VARCHAR}
+</select>
+<!-- 查看全部消息（本用户下的所有消息）/查询本用户下的所有未读消息 -->
+<select id="findAllByNews" resultType="java.util.Map">
+SELECT 
+s.id,
+(SELECT d111_01 FROM d111 WHERE d111_03=s.`s101_01` AND d111_05='100') newtype,
+s.s101_02 newstate,
+s.s101_03 stuid,
+s.s101_04 newcontent,
+DATE_FORMAT(s.s101_05, '%Y-%m-%d %T') newtime
+FROM s101 s
+WHERE s.s101_03=#{stuid,jdbcType=VARCHAR}
+ <if test="newstate != null and newstate !=''" >
+AND s.s101_02=#{newstate,jdbcType=VARCHAR}
+</if>
+ORDER BY id DESC
+</select>
+
+<!-- 查询本用户下的所有未读消息 -->
+<select id="findAllByUnRead" resultType="java.util.Map">
+SELECT 
+s.id,
+(SELECT d111_01 FROM d111 WHERE d111_03=s.`s101_01` AND d111_05='100') newtype,
+s.s101_02 newstate,
+s.s101_03 stuid,
+s.s101_04 newcontent,
+DATE_FORMAT(s.s101_05, '%Y-%m-%d %T') newtime
+FROM s101 s
+WHERE s.s101_03 = #{stuid,jdbcType=VARCHAR}
+AND s101_02='0'
+ORDER BY id DESC
+</select>
+
+<!-- 将未读消息标记为已读（更新消息状态） -->
+<update id="updateByUnRead" parameterType="java.util.Map">
+update s101
+set s101_02=1
+where id=#{id,jdbcType=VARCHAR}
+</update>
+
+<!-- 查询单个消息，进行详细查看 -->
+<select id="findByOneNews" resultType="java.util.Map">
+SELECT 
+id,
+(SELECT d111_01 FROM d111 WHERE d111_03=s.`s101_01` AND d111_05='100') newtype,
+s101_02 newstate,
+s.s101_03 stuid,
+s101_04 newcontent,
+DATE_FORMAT(s101_05, '%Y-%m-%d %T') newtime,
+s101_06 hwid
+FROM s101 s
+WHERE id=#{id,jdbcType=VARCHAR}
+</select>
+<!-- 删除消息 -->
+<delete id="delByNews" parameterType="java.util.Map">
+delete from s101
+where id=#{id,jdbcType=VARCHAR}
+</delete>
+</mapper>

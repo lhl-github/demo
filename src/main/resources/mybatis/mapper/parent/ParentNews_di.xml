@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.parent.dao.ParentNews_di" >
+
+
+<!-- 查看全部消息（本用户下的所有消息）/查询本用户下的所有未读消息 -->
+<select id="findAllByNews" resultType="java.util.Map">
+SELECT 
+s.id,
+(SELECT d111_01 FROM d111 WHERE d111_03=s.`p101_01` AND d111_05='100') newtype,
+s.p101_02 newstate,
+s.p101_03 pid,
+s.p101_04 newcontent,
+DATE_FORMAT(s.p101_05, '%Y-%m-%d %T') newtime,
+s.p101_06 stuid,
+s.p101_07 hwid
+FROM p100 s
+WHERE s.p101_03=#{pid,jdbcType=VARCHAR}
+<if test="newtype !=null and newtype != ''">
+AND s.`p101_01`=#{newtype,jdbcType=VARCHAR}
+</if>
+ORDER BY id DESC
+</select>
+
+<!-- 查询单个消息，进行详细查看 -->
+<select id="findByOneNews" resultType="java.util.Map">
+SELECT 
+id,
+(SELECT d111_01 FROM d111 WHERE d111_03=s.`p101_01` AND d111_05='100') newtype,
+p101_02 newstate,
+p101_03 pid,
+p101_04 newcontent,
+DATE_FORMAT(p101_05, '%Y-%m-%d %T') newtime,
+p101_06 stuid,
+p101_07 hwid
+FROM p100 s
+WHERE id=#{id,jdbcType=VARCHAR}
+</select>
+
+<select id="findByHomework" resultType="java.util.Map">
+SELECT
+t.`t102_08` homewordName,
+t.`t102_06` finishPeople,
+date_format(t.`t102_05`, '%Y-%m-%d %T') endTime,
+date_format(t.`t102_04`, '%Y-%m-%d %T') startTime,
+t.`t102_03` hwid,
+t.`t102_10` homework_cishu
+FROM t102 t,d112 d
+WHERE d.`d112_01`=t.`t102_02`
+AND d.`d112_02`=#{stuid,jdbcType=VARCHAR}
+<if test="hwid != null and hwid !=''">
+AND t.`t102_03` =#{hwid,jdbcType=VARCHAR}
+</if>
+</select>
+<!-- 删除消息 -->
+<delete id="delByNews" parameterType="java.util.Map">
+delete from p100
+where id=#{id,jdbcType=VARCHAR}
+</delete>
+
+<select id="findUnRead" resultType="java.lang.Integer">
+SELECT COUNT(*)
+FROM p100 
+WHERE p101_02='0'
+AND p101_03=#{pid,jdbcType=VARCHAR}
+</select>
+</mapper>

@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.student.text.dao.StuText_di" >
+<!-- 第一部分  进入某下的所有内容 -->
+<!-- 根据jclx，nj，sxc选择课文 -->
+<select id="findBySortByType" resultType="java.util.Map">
+ SELECT 
+DISTINCT
+k.type,
+(SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy,
+CONCAT_WS('_', t01, t02, t03, t04, t05 ) save,
+t.t06 photos
+ FROM texttype t
+ <if test="flag == 'text'">
+ ,k102 k
+</if>
+<if test="flag == 'word'">
+ ,k103 k
+ </if>
+ <if test="flag == 'phrase'">
+ ,k103 k
+ </if>
+ <if test="flag == 'sentence'">
+ ,k105 k
+ </if>
+ <if test="flag == 'talk'">
+ ,k107 k
+ </if>
+ <if test="flag == 'read'">
+ ,k106 k
+ </if>
+ <if test="flag == 'listen'">
+ ,k101 k
+ </if>
+ WHERE 
+ t.type=k.`type`
+ <if test="listen_type =='1'">
+ AND k.k101_02=#{listen_type,jdbcType=VARCHAR}
+ </if>
+ <if test="listen_type =='2'">
+ AND k.k101_02=#{listen_type,jdbcType=VARCHAR}
+ </if>
+ <if test="flag == 'word'">
+ AND k.k103_06 = 'word'
+ </if>
+ <if test="flag == 'phrase'">
+AND k.k103_06 = 'phrase'
+ </if>
+<if test="jclx !=null and jclx !=''">
+AND t.t01=(SELECT d111_03 FROM d111 WHERE d111_05='60' AND d111_01=#{jclx,jdbcType=VARCHAR})
+</if>
+<if test="nj !=null and nj !=''">
+AND t.t03=(SELECT d111_03 FROM d111 WHERE d111_05='10' AND d111_01=#{nj,jdbcType=VARCHAR})
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.t04=(SELECT d111_03 FROM d111 WHERE d111_05='37' AND d111_01=#{sxc,jdbcType=VARCHAR})
+</if>
+order by t.`t05`
+</select>
+<!-- 第二部分   根据每个单元下的数据查询每个单元下的数据 -->
+<!--课文  -->
+<select id="findByDyByText" resultType="java.util.Map">
+SELECT
+k.id text_id,
+k.k102_01 text_title,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+ FROM k102 k,texttype t
+ WHERE
+ t.type=k.type
+ AND k.type=#{type,jdbcType=VARCHAR}
+</select>
+<!--  单词-->
+<select id="findByDyByWord" resultType="java.util.Map">
+SELECT 
+k.id word_id,
+k.id hw_answerId,
+k.k103_01 word,
+k.k103_02 word_tran,
+k.k103_03 word_prase,
+k.k103_04 word_praseTran,
+k.k103_05 word_video,
+k.type,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k103 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`type`=#{type,jdbcType=VARCHAR}
+AND k.k103_06='word'
+order by k.ids
+</select>
+<!-- 短语 -->
+<select id="findByDyByPhrase" resultType="java.util.Map">
+SELECT 
+k.id phrase_id,
+k.id hw_answerId,
+k.k103_03 phrase,
+k.k103_04 phrase_tran,
+k.k103_05 phrase_video,
+k.type,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k103 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`type`=#{type,jdbcType=VARCHAR}
+AND k.k103_06='phrase'
+order by k.ids
+</select>
+<!--  句子-->
+<select id="findByDyBySentence" resultType="java.util.Map">
+SELECT 
+k.id sentence_id,
+k.k105_01 sentence_name,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k105 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`type`=#{type,jdbcType=VARCHAR}
+</select>
+<!-- 对话 -->
+<select id="findByDyByTalk" resultType="java.util.Map">
+SELECT 
+k.id talk_id,
+k.k107_02 talk_name,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k107 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`type`=#{type,jdbcType=VARCHAR}
+</select>
+<!--  听力-->
+<select id="findByDyByListen" resultType="java.util.Map">
+SELECT 
+k.id listen_id,
+CONCAT_WS('',k.`k101_03` ,k.k101_01) listen_name,
+k.`k101_02` listen_type,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k101 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`k101_02` =#{listen_type,jdbcType=VARCHAR}
+AND k.`type`=#{type,jdbcType=VARCHAR}
+</select>
+<!-- 阅读 -->
+<select id="findByDyByRead" resultType="java.util.Map">
+SELECT
+k.`id` read_id,
+k.`k106_01` read_title,
+CONCAT_WS('_', t01, t02, t03, t04, t05) save
+FROM k106 k,texttype t
+WHERE k.`type`=t.`type`
+AND k.`type`=#{type,jdbcType=VARCHAR}
+</select>
+
+<!-- 第三部分   详情 -->
+<!-- 句子详情 -->
+<select id="findBySentenceById" resultType="java.util.Map">
+SELECT 
+ id sentence_sid,
+ id hw_answerId,
+ k104_01 sentence_id,
+ k104_02 sentence_zw,
+ k104_03 sentence_yw,
+ k104_04 sentence_video
+ FROM k104
+ WHERE k104_01= #{sentence_id,jdbcType=VARCHAR}
+ order by ids
+</select>
+<!-- 课文详情 -->
+<select id="findByTextById" resultType="java.util.Map">
+SELECT 
+k.id text_id,
+k.id hw_answerId,
+k.k102_02 text_zw,
+k.k102_03 text_yw,
+k.k102_04 text_video,
+k.k102_05 text_photo
+FROM k102 k
+WHERE id=#{text_id}
+</select>
+<!-- 对话详情 -->
+<select id="findByTalkById" resultType="java.util.Map">
+SELECT 
+k108_02 juese_name,
+k108_03 juese_zw,
+k108_04 juese_yw,
+k108_05 juese_video,
+id juese_id,
+id hw_answerId
+FROM k108 
+WHERE k108_01=#{talk_id,jdbcType=VARCHAR}
+order by ids
+</select>
+<!-- 听力详情 -->
+<select id="findByListenById1" resultType="java.util.Map">
+SELECT 
+k.id listen_id,
+k.`k101_03` listen_text,
+k.`k101_02` listen_type,
+k.`k101_04` listen_video,
+k.`k101_05` listen_tldist,
+k.`k101_06` listen_require,
+k.`k101_07` listen_content
+FROM k101 k
+WHERE id=#{listen_id}
+</select>
+<select id="findByListenById2" resultType="java.util.Map">
+SELECT
+id listen_questId,
+id hw_answerId,
+k110_01 listen_questName,
+k110_03 listen_question,
+k110_05 listen_answer,
+k110_06 listen_resolve,
+k110_07 listen_questVideo
+FROM k110
+WHERE k110_02=#{listen_id}
+ORDER BY order_00
+</select>
+<select id="findByListenById3" resultType="java.util.Map">
+SELECT
+id listen_optionId,
+k111_01 listen_option,
+k111_02 listen_optionContent,
+k111_04 listen_optionPhotoes,
+k111_05 listen_optionVideo
+FROM k111
+WHERE k111_03=#{listen_questId}
+</select>
+
+<!-- 阅读详情 -->
+<select id="findByReadById1" resultType="java.util.Map">
+SELECT 
+k106_02 read_text,
+k106_03 read_content
+FROM k106
+WHERE id=#{read_id}
+</select>
+<select id="findByReadById2" resultType="java.util.Map">
+SELECT
+id read_qid,
+id hw_answerId,
+k116_02 read_question,
+k116_03 read_answer,
+k116_04 read_resolve
+FROM k116
+WHERE k116_01=#{read_id}
+ORDER BY ids
+</select>
+<select id="findByReadById3" resultType="java.util.Map">
+SELECT 
+id read_xid,
+k126_02 read_option,
+k126_03 read_photoes,
+k126_04 read_optionText
+FROM k126
+WHERE k126_01=#{read_qid}
+ORDER BY ids
+</select>
+
+
+<!-- 查询课文单元表进行对jclx，nj，sxc的拼接查询 -->
+<select id="findByType" resultType="java.util.Map">
+SELECT DISTINCT
+(SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc
+ FROM texttype t
+</select>
+
+
+<!-- 查询音标 -->
+<select id="findBySortBySymbol" resultType="java.util.Map">
+SELECT 
+  yb.yb100_00 ybid,
+  yb.yb100_01 symbol,
+  (SELECT 
+    d111_01 
+  FROM
+    d111 
+  WHERE d111_03 = yb.yb100_02 AND d111_05='111') ybtype,
+  yb.yb100_03 video 
+FROM
+  yb100 yb 
+</select>
+<!-- 根据音标id查询发音实例 -->
+<select id="findByFayinshili" resultType="java.util.Map">
+SELECT
+yb101_00 yb_wordId,
+yb101_00 hw_answerId,
+yb101_01 yb_word,
+yb101_02 yb_translate,
+yb101_03 yb_photoes,
+yb101_04 yb_Avideo,
+yb101_05 yb_Bvideo
+FROM yb101
+WHERE yb101_06=#{ybid,jdbcType=VARCHAR}
+<if test="shiliType == 1">
+AND yb101_07='1'
+</if>
+<if test="shiliType != 1">
+AND yb101_07 != '1'
+</if>
+ORDER BY yb101_00
+</select>
+<!-- 根据音标id查询详解 -->
+<select id="findByFayinxiangjie" resultType="java.util.Map">
+SELECT
+yb102_02  yb_photo,
+yb102_03 yb_cartoon,
+yb102_04 yb_human,
+yb102_05 yb_translate
+FROM yb102
+WHERE yb102_01=#{ybid,jdbcType=VARCHAR}
+ORDER BY yb102_00
+</select>
+<!-- 根据音标id查询字母及其单词 -->
+<select id="findByZimu" resultType="java.util.Map">
+SELECT 
+yb103_00 yb_id,
+yb103_02 yb_symbol,
+yb103_03 yb_video
+FROM yb103
+WHERE yb103_01=#{ybid,jdbcType=VARCHAR}
+ORDER BY yb103_00
+</select>
+<!-- 根据字母id查询下面的字母 -->
+<select id="findByZuhe" resultType="java.util.Map">
+SELECT 
+yb104_02 yb_sym_word,
+yb104_03 yb_sym_tran,
+yb104_04 yb_sym_video
+FROM yb104
+WHERE yb104_01=#{yb_id,jdbcType=VARCHAR}
+ORDER BY yb104_00
+</select>
+<!-- 根据ybid查询音标给尝试发音 -->
+<select id="findBySymbolByYbid" resultType="java.util.Map">
+SELECT 
+yb.yb100_01 symbol,
+(SELECT d111_01 FROM d111 WHERE d111_03 = yb.yb100_02 AND d111_05='111') ybtype,
+yb.yb100_03 video
+FROM yb100 yb
+WHERE yb.yb100_00=#{ybid,jdbcType=VARCHAR}
+</select>
+
+</mapper>

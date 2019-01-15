@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.student.user.dao.StuLogin_di" >
+
+<select id="login" resultType="java.util.Map">
+SELECT 
+id stuid,
+d101_01 student,
+d101_03 username,
+d101_04 areas,
+d101_05 schoolId,
+d101_06 sex,
+d101_14 memberState,
+d101_15 starttime,
+d101_16 endtime,
+d101_37 stuTupian
+FROM d1015
+WHERE
+d101_03=#{username,jdbcType=VARCHAR}
+AND d101_11=#{password,jdbcType=VARCHAR}
+</select>
+
+<select id="findByUsername" resultType="java.util.Map">
+SELECT 
+id stuid,
+d101_01 student,
+d101_03 username,
+d101_04 areas,
+d101_05 schoolId,
+d101_06 sex,
+d101_14 memberState,
+d101_15 starttime,
+d101_16 endtime
+FROM d1015
+WHERE
+d101_03=#{username,jdbcType=VARCHAR}
+</select>
+
+<update id="updateStuInfo" parameterType="java.util.Map">
+update d1015
+ <set>
+ <if test="student != null and student !=''" >
+  d101_01 = #{student,jdbcType=VARCHAR},
+</if>
+<if test="stuTupian != null and stuTupian !=''" >
+  d101_37 = #{stuTupian,jdbcType=VARCHAR},
+</if>
+ </set>
+ WHERE id=#{stuid,jdbcType=VARCHAR}
+</update>
+
+<update id="updateStuVip" parameterType="java.util.Map">
+update d1015
+ <set>
+<if test="memberState != null and memberState !=''" >
+  d101_14 = #{memberState,jdbcType=VARCHAR},
+  d101_15 = #{starttime,jdbcType=TIMESTAMP},
+  d101_16 = #{endtime,jdbcType=TIMESTAMP},
+</if>
+ </set>
+ WHERE id=#{stuid,jdbcType=VARCHAR}
+</update>
+<select id="findByStuid" resultType="java.util.Map">
+SELECT 
+id stuid,
+d101_01 student,
+d101_03 username,
+d101_04 areas,
+(SELECT d.d108_02 FROM d108 d WHERE d.d108_01=d101_05) school,
+d101_06 sex,
+d101_14 memberState,
+d101_15 starttime,
+d101_16 endtime,
+d101_37 stuTupian
+FROM d1015
+WHERE
+id=#{stuid,jdbcType=VARCHAR}
+</select>
+
+<select id="findByClass" resultType="java.util.Map">
+SELECT (SELECT d107_01 FROM d107 WHERE d107_03 = (SELECT d.d112_01 FROM d112 d WHERE d.d112_02 = #{stuid,jdbcType=VARCHAR})) classId,
+(SELECT d3.d101_01 FROM d1012 d3 WHERE d2.`d113_01`= d3.id) teacher
+FROM d113 d2
+WHERE d2.d113_02 =
+(SELECT d.d112_01
+FROM d112 d
+WHERE d.d112_02 = #{stuid,jdbcType=VARCHAR})
+
+</select>
+
+<!-- 加入班级（如果学生班级表为空，则学生可以通过班级代码或者老师手机号码） -->
+<insert id="saveByClassId" parameterType="java.util.Map">
+insert into d112
+<trim prefix="(" suffix=")" suffixOverrides="," >
+<if test="classId != null and classId !=''" >
+d112_01,
+</if>
+<if test="stuid != null and stuid !=''" >
+d112_02,
+</if>
+</trim>
+<trim prefix="values (" suffix=")" suffixOverrides="," >
+<if test="classId != null and classId !=''" >
+#{classId,jdbcType=VARCHAR},
+</if>
+<if test="stuid != null and stuid !=''" >
+#{stuid,jdbcType=VARCHAR},
+</if>
+</trim>
+</insert>
+<update id="updateByClassId" parameterType="java.util.Map">
+update d112
+ <set>
+ <if test="classId != null and classId !=''" >
+  d112_01 = #{classId,jdbcType=VARCHAR},
+</if>
+ </set>
+ WHERE 1=1
+ <if test="stuid != null and stuid !=''" >
+AND d112_02 = #{stuid,jdbcType=VARCHAR}
+</if>
+</update>
+
+<!-- 根据班级代码查询班级 -->
+<select id="findByClassId" resultType="java.util.Map">
+SELECT 
+d107_01 className,
+d107_02 teacherId,
+d107_03 classId,
+d107_04 grade
+FROM d107
+WHERE d107_03=#{classId,jdbcType=VARCHAR}
+</select>
+<!-- 根据老师手机号查询班级 -->
+<select id="findByTeacherPhone" resultType="java.util.Map">
+SELECT 
+d1.d107_01 className,
+d1.d107_02 teacherId,
+d1.d107_03 classId,
+d1.d107_04 grade
+FROM d107 d1,d1012 d2,d113 d3
+WHERE d1.`d107_03` = d3.`d113_02`
+AND d2.`Id` = d3.`d113_01`
+AND d2.`d101_12`=#{teacherPhone,jdbcType=VARCHAR}
+</select>
+
+<update id="updatePassword" parameterType="java.util.Map">
+update d1015
+ <set>
+ <if test="password != null and password !=''" >
+  d101_11 = #{password,jdbcType=VARCHAR},
+</if>
+ </set>
+ WHERE 1=1
+ <if test="stuid != null and stuid !=''" >
+AND id = #{stuid,jdbcType=VARCHAR}
+</if>
+</update>
+
+<select id="findBySheng" resultType="java.util.Map">
+SELECT d106_02 sheng_name,
+d106_01 sheng_id
+FROM d106
+WHERE d106_03 = '86'
+</select>
+<select id="findByShi" resultType="java.util.Map">
+SELECT d106_02 shi_name,
+d106_01 shi_id
+FROM d106
+WHERE d106_03 = #{sheng_id}
+</select>
+<select id="findByQu" resultType="java.util.Map">
+SELECT d106_02 qu_name,
+d106_01 qu_id
+FROM d106
+WHERE d106_03 = #{shi_id}
+</select>
+<select id="findBySchool" resultType="java.util.Map">
+select 
+d108_01 school_id,
+d108_02 school
+from d108
+where d108_03 = #{qu_id}
+</select>
+
+<update id="updateSchool"  parameterType="java.util.Map">
+update d1015
+<set>
+ <if test="school_id != null and school_id !=''" >
+  d101_05 = #{school_id,jdbcType=VARCHAR},
+</if>
+ </set>
+ WHERE 1=1
+ <if test="stuid != null and stuid !=''" >
+AND id = #{stuid,jdbcType=VARCHAR}
+</if>
+</update>
+<!-- 退出班级 -->
+<delete id="delClass" parameterType="java.util.Map">
+delete from  d112
+where d112_02 =#{stuid,jdbcType=VARCHAR}
+</delete>
+
+<!-- 判断是否存在会员卡号及其密码 -->
+<select id="findByCard" resultType="java.lang.String">
+SELECT v100_03 time
+FROM v100
+WHERE v100_01=#{cardName}
+AND v100_02=#{cardPassword}
+</select>
+<delete id="delByCard" parameterType="java.util.Map">
+delete from v100
+where
+v100_01=#{cardName}
+AND v100_02=#{cardPassword}
+</delete>
+</mapper>

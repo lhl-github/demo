@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xljy.kwld.dao.Read_di" >
+
+<insert id="saveRead" parameterType="java.util.Map">
+insert into k106
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rid != null and rid !=''" >
+        id,
+      </if>
+      <if test="readtitle != null and readtitle !=''" >
+        k106_01,
+      </if>
+       <if test="readtext != null and readtext !=''" >
+        k106_02,
+      </if>
+      <if test="readcontent != null and readcontent !=''" >
+        k106_03,
+      </if>
+        <if test="photoes != null and photoes !=''" >
+        k106_04,
+      </if>
+      <if test="type != null and type !=''" >
+        type,
+      </if>   
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rid != null and rid !=''" >
+        #{rid,jdbcType=VARCHAR},
+      </if>
+      <if test="readtitle != null and readtitle !=''" >
+        #{readtitle,jdbcType=VARCHAR},
+      </if>
+        <if test="readtext != null and readtext !=''" >
+        #{readtext,jdbcType=VARCHAR},
+      </if>
+      <if test="readcontent != null and readcontent !=''" >
+         #{readcontent,jdbcType=VARCHAR},
+      </if>
+       <if test="photoes != null and photoes !=''" >
+        #{photoes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+    </trim>
+</insert>
+
+<update id="updateRead" parameterType="java.util.Map">
+   update k106
+    <set >
+      <if test="readtitle != null and readtitle !=''" >
+        k106_01 = #{readtitle,jdbcType=VARCHAR},
+      </if>
+       <if test="readtext != null and readtext !=''" >
+        k106_02 = #{readtext,jdbcType=VARCHAR},
+      </if>
+      <if test="readcontent != null and readcontent !=''" >
+        k106_03 = #{readcontent,jdbcType=VARCHAR},
+      </if>
+       <if test="photoes != null and photoes !=''" >
+        k106_04 = #{photoes,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null and type !=''" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>   
+    </set>
+    where id = #{rid,jdbcType=VARCHAR}
+</update>
+<insert id="saveQuest" parameterType="java.util.Map">
+insert into k116
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="qid != null and qid !=''" >
+        id,
+      </if>
+      <if test="rid != null and rid !=''" >
+        k116_01,
+      </if>
+       <if test="readquest != null and readquest !=''" >
+        k116_02,
+      </if>
+      <if test="readanswer != null and readanswer !=''" >
+        k116_03,
+      </if>
+      <if test="readresolve != null and readresolve !=''" >
+         k116_04,
+      </if>   
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="qid != null and qid !=''" >
+        #{qid,jdbcType=VARCHAR},
+      </if>
+       <if test="rid != null and rid !=''" >
+        #{rid,jdbcType=VARCHAR},
+      </if>
+       <if test="readquest != null and readquest !=''" >
+        #{readquest,jdbcType=VARCHAR},
+      </if>
+      <if test="readanswer != null and readanswer !=''" >
+        #{readanswer,jdbcType=VARCHAR},
+      </if>
+      <if test="readresolve != null and readresolve !=''" >
+        #{readresolve,jdbcType=VARCHAR},
+      </if>   
+    </trim>
+</insert>
+
+<update id="updateQuest" parameterType="java.util.Map">
+   update k116
+    <set >
+        <if test="rid != null and rid !=''" >
+        k116_01 = #{rid,jdbcType=VARCHAR},
+      </if>
+       <if test="readquest != null and readquest !=''" >
+        k116_02 = #{readquest,jdbcType=VARCHAR},
+      </if>
+      <if test="readanswer != null and readanswer !=''" >
+        k116_03 = #{readanswer,jdbcType=VARCHAR},
+      </if>
+      <if test="readresolve != null and readresolve !=''" >
+        k116_04 = #{readresolve,jdbcType=VARCHAR},
+      </if>   
+    </set>
+    where id = #{qid,jdbcType=VARCHAR}
+</update>
+
+<insert id="saveXuan" parameterType="java.util.Map">
+insert into k126
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="xid != null and xid !=''" >
+        id,
+      </if>
+      <if test="qid != null and qid !=''" >
+        k126_01,
+      </if>
+       <if test="xuanxiang != null and xuanxiang !=''" >
+        k126_02,
+      </if>
+      <if test="tupian != null and tupian !=''" >
+        k126_03,
+      </if>
+      <if test="xxtext != null and xxtext !=''" >
+         k126_04,
+      </if>   
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+    <if test="xid != null and xid !=''" >
+        #{xid,jdbcType=VARCHAR},
+      </if>
+      <if test="qid != null and qid !=''" >
+        #{qid,jdbcType=VARCHAR},
+      </if>
+      <if test="xuanxiang != null and xuanxiang !=''" >
+         #{xuanxiang,jdbcType=VARCHAR},
+      </if>
+      <if test="tupian != null and tupian !=''" >
+       #{tupian,jdbcType=VARCHAR},
+      </if>
+      <if test="xxtext != null and xxtext !=''" >
+        #{xxtext,jdbcType=VARCHAR},
+      </if>   
+    </trim>
+</insert>
+<update id="updateXuan" parameterType="java.util.Map">
+ update k126
+    <set >
+        <if test="qid != null and qid !=''" >
+        k126_01 = #{qid,jdbcType=VARCHAR},
+      </if>
+       <if test="xuanxiang != null and xuanxiang !=''" >
+        k126_02 = #{xuanxiang,jdbcType=VARCHAR},
+      </if>
+      <if test="tupian != null and tupian !=''" >
+        k126_03 = #{tupian,jdbcType=VARCHAR},
+      </if>
+      <if test="xxtext != null and xxtext !=''" >
+        k126_04 = #{xxtext,jdbcType=VARCHAR},
+      </if>   
+    </set>
+    where id = #{xid,jdbcType=VARCHAR}
+</update>
+
+<delete id="delRead" parameterType="java.util.Map">
+delete from k106
+    where id = #{rid,jdbcType=VARCHAR}
+</delete>
+
+<delete id="delQuest" parameterType="java.util.Map">
+delete from k116
+    where id = #{qid,jdbcType=VARCHAR}
+</delete>
+<delete id="delQuestByRid" parameterType="java.util.Map">
+delete from k116
+    where  k116_01 = #{rid,jdbcType=VARCHAR}
+</delete>
+<delete id="delXuan" parameterType="java.util.Map">
+delete from k126
+    where id = #{xid,jdbcType=VARCHAR}
+</delete>
+<delete id="delXuanByQid" parameterType="java.util.Map">
+delete from k126
+    where k126_01 = #{qid,jdbcType=VARCHAR}
+</delete>
+
+<select id="findAll" resultType="java.util.Map">
+  SELECT 
+ k1.id rid,
+ k1.k106_01 readtitle,
+ k1.k106_02 readtext,
+ k1.k106_03 readcontent,
+ k1.k106_04 photoes,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t01` AND d111_05='60') jclx,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t02` AND d111_05='43') xd,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t03` AND d111_05='10') nj,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t04` AND d111_05='37') sxc,
+ (SELECT d111_01 FROM d111 WHERE d111_03=t.`t05` AND d111_05='31') dy,
+ t.`t03` nj_d,
+ t.`t04` sxc_d,
+ t.`t05` dy_d,
+ t.t06 photo
+FROM texttype t ,k106 k1
+WHERE k1.`type`=t.`type`
+<if test="jclx !=null and jclx !=''">
+AND t.`t01`=#{jclx,jdbcType=VARCHAR}
+</if>
+<if test="xd !=null and xd !=''">
+AND t.`t02`=#{xd,jdbcType=VARCHAR}
+</if>
+<if test="nj !=null and nj !=''">
+AND t.`t03`=#{nj,jdbcType=VARCHAR}
+</if>
+<if test="sxc !=null and sxc !=''">
+AND t.`t04`=#{sxc,jdbcType=VARCHAR}
+</if>
+<if test="dy !=null and dy !=''">
+AND t.`t05`=#{dy,jdbcType=VARCHAR}
+</if>
+<if test="rid !=null and rid !=''">
+AND k1.id=#{rid,jdbcType=VARCHAR}
+</if>
+order by k1.type
+</select>
+
+<select id="findAllQuest" resultType="java.util.Map">
+SELECT 
+id qid,
+k116_01 rid,
+k116_02 readquest,
+k116_03 readanswer,
+k116_04 readresolve,
+ids
+FROM k116
+WHERE k116_01 = #{rid,jdbcType=VARCHAR}
+order by ids
+</select>
+
+<select id="findQuestByContent" resultType="java.util.Map">
+SELECT 
+id qid,
+k116_01 rid,
+k116_02 readquest,
+k116_03 readanswer,
+k116_04 readresolve,
+ids
+FROM k116
+WHERE 1=1
+ <if test="rid != null and rid !=''" >
+and  k116_01 = #{rid,jdbcType=VARCHAR}
+</if>
+<if test="readquest != null and readquest !=''" >
+and k116_02 = #{readquest,jdbcType=VARCHAR}
+</if>
+<if test="readanswer != null and readanswer !=''" >
+and k116_03 = #{readanswer,jdbcType=VARCHAR}
+</if>
+<if test="readresolve != null and readresolve !=''" >
+and k116_04 = #{readresolve,jdbcType=VARCHAR}
+</if>
+order by ids   
+</select>
+
+<select id="findAllXuan" resultType="java.util.Map">
+SELECT 
+id xid,
+k126_01 qid,
+k126_02 xuanxiang,
+k126_03 tupian,
+k126_04 xxtext,
+ids
+FROM k126
+WHERE k126_01 = #{qid,jdbcType=VARCHAR}
+order by ids 
+</select>
+<select id="findXuanByContent" resultType="java.util.Map">
+SELECT 
+id xid,
+k126_01 qid,
+k126_02 xuanxiang,
+k126_03 tupian,
+k126_04 xxtext,
+ids
+FROM k126
+WHERE 1=1
+  <if test="qid != null and qid !=''" >
+and  k126_01 = #{qid,jdbcType=VARCHAR}
+</if>
+<if test="xuanxiang != null and xuanxiang !=''" >
+and k126_02 = #{xuanxiang,jdbcType=VARCHAR}
+</if>
+<if test="tupian != null and tupian !=''" >
+and k126_03 = #{tupian,jdbcType=VARCHAR}
+</if>
+<if test="xxtext != null and xxtext !=''" >
+and k126_04 = #{xxtext,jdbcType=VARCHAR}
+</if> 
+</select>
+<select id="findByID" resultType="java.util.Map">
+SELECT k.id rid,
+k.k106_01 readtitle,
+k.k106_02 readtext,
+k.k106_03 readcontent,
+k.k106_04 photoes,
+ t.`t01` jclx,
+ t.`t02` xd,
+ t.`t03` nj,
+ t.`t04` sxc,
+ t.`t05` dy,
+ t.`t06` photo,
+t.type
+FROM k106 k,texttype t
+WHERE k.id=#{rid,jdbcType=VARCHAR}
+and t.type=k.type
+</select>
+</mapper>
